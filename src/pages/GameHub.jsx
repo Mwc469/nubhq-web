@@ -613,6 +613,45 @@ export default function GameHub() {
             })}
           </div>
         </motion.div>
+
+        {/* Team Progress Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="mt-4 p-4 bg-gradient-to-r from-neon-purple/10 to-neon-cyan/10 rounded-xl border-2 border-neon-purple/30"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Trophy className="w-5 h-5 text-neon-purple" />
+              <h3 className="font-bold text-gray-800 dark:text-white text-sm">
+                Team Weekly Goal
+              </h3>
+            </div>
+            <span className="text-xs text-neon-purple font-bold">
+              +500 XP Bonus
+            </span>
+          </div>
+          <div className="relative h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden border-2 border-black/20">
+            <motion.div
+              className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-neon-purple to-neon-cyan"
+              initial={{ width: 0 }}
+              animate={{ width: '67%' }}
+              transition={{ duration: 1, delay: 0.7 }}
+            />
+          </div>
+          <div className="flex justify-between mt-2 text-xs">
+            <span className="text-gray-500 dark:text-gray-400">
+              Team: 6,700 / 10,000 XP
+            </span>
+            <span className="text-neon-cyan font-bold">
+              67% complete
+            </span>
+          </div>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
+            Help the team reach 10k XP for a bonus!
+          </p>
+        </motion.div>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User, Bell, Shield, Palette, Loader2, Sun, Moon, CreditCard, Key, Globe, Zap, Volume2, VolumeX, Vibrate, Sparkles, Gamepad2 } from 'lucide-react';
+import { User, Bell, Shield, Palette, Loader2, Sun, Moon, CreditCard, Key, Globe, Zap, Volume2, VolumeX, Vibrate, Sparkles, Gamepad2, Leaf } from 'lucide-react';
 import { cn } from '../lib/utils';
 import NeoBrutalCard from '../components/ui/NeoBrutalCard';
 import NeoBrutalButton from '../components/ui/NeoBrutalButton';
@@ -77,6 +77,7 @@ const Settings = () => {
       hapticsEnabled: true,
       showPortal: true,
       cosmicBackground: 'subtle',
+      zenMode: false, // Disable XP, combos, timers for relaxed play
     };
   });
 
@@ -187,6 +188,24 @@ const Settings = () => {
                     cosmicBackground: prev.cosmicBackground === 'off' ? 'subtle' : 'off'
                   }));
                 }}
+                isLight={isLight}
+              />
+            </label>
+            <label className="flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors cursor-pointer col-span-full sm:col-span-1">
+              <div className="flex items-center gap-3">
+                <Leaf size={20} className={gameSettings.zenMode ? 'text-emerald-400' : 'text-white/40'} />
+                <div>
+                  <span className={cn('font-medium block', isLight ? 'text-gray-700' : 'text-white/80')}>
+                    Zen Mode
+                  </span>
+                  <span className={cn('text-xs', isLight ? 'text-gray-400' : 'text-white/40')}>
+                    No XP, combos, or pressure
+                  </span>
+                </div>
+              </div>
+              <ToggleSwitch
+                checked={gameSettings.zenMode}
+                onChange={() => handleGameToggle('zenMode', gameSettings.zenMode)}
                 isLight={isLight}
               />
             </label>

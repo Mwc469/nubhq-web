@@ -24,6 +24,7 @@ import { playSound } from '../lib/soundSystem';
 import { haptic } from '../components/mobile/MobileComponents';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
+import MobileBottomNav from '../components/mobile/MobileBottomNav';
 
 // Get player stats from localStorage
 function getPlayerStats() {
@@ -118,6 +119,10 @@ const Layout = () => {
   const [logoTaps, setLogoTaps] = useState(0);
   const [konamiIndex, setKonamiIndex] = useState(0);
   const [easterEggActive, setEasterEggActive] = useState(false);
+  const [konamiUnlocked, setKonamiUnlocked] = useState(() =>
+    localStorage.getItem('nub_konami_unlocked') === 'true'
+  );
+  const [showKonamiToast, setShowKonamiToast] = useState(false);
   const isLight = theme === 'light';
 
   const playerStats = useMemo(() => getPlayerStats(), []);
@@ -146,27 +151,58 @@ const Layout = () => {
     });
   }, [gameSettings.hapticsEnabled, gameSettings.soundEnabled]);
 
-  // Easter egg: Konami code
+  // Easter egg: Konami code - unlock Retro Mode!
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === KONAMI_CODE[konamiIndex]) {
+      const key = e.key.toLowerCase() === 'b' || e.key.toLowerCase() === 'a'
+        ? e.key.toLowerCase()
+        : e.key;
+
+      const expected = KONAMI_CODE[konamiIndex].toLowerCase();
+      if (key.toLowerCase() === expected) {
         if (konamiIndex === KONAMI_CODE.length - 1) {
-          // Konami code complete!
-          if (gameSettings.soundEnabled) playSound('levelUp');
-          if (gameSettings.hapticsEnabled) haptic?.('success');
+          // KONAMI CODE COMPLETE!
+          if (!konamiUnlocked) {
+            // First time unlock!
+            setKonamiUnlocked(true);
+            localStorage.setItem('nub_konami_unlocked', 'true');
+
+            // Store hidden achievement
+            const achievements = JSON.parse(localStorage.getItem('nub_hidden_achievements') || '[]');
+            if (!achievements.includes('konami_master')) {
+              achievements.push('konami_master');
+              localStorage.setItem('nub_hidden_achievements', JSON.stringify(achievements));
+            }
+
+            // Epic celebration!
+            if (gameSettings.soundEnabled) {
+              playSound('levelUp');
+              setTimeout(() => playSound('achievement'), 300);
+            }
+            if (gameSettings.hapticsEnabled) {
+              haptic?.('success');
+              haptic?.('success');
+            }
+            setShowKonamiToast(true);
+            setTimeout(() => setShowKonamiToast(false), 5000);
+          } else {
+            // Already unlocked, just celebrate
+            if (gameSettings.soundEnabled) playSound('combo');
+            if (gameSettings.hapticsEnabled) haptic?.('light');
+          }
           setEasterEggActive(true);
           setTimeout(() => setEasterEggActive(false), 5000);
           setKonamiIndex(0);
         } else {
           setKonamiIndex(prev => prev + 1);
         }
-      } else {
+      } else if (e.key !== 'Shift') {
         setKonamiIndex(0);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [konamiIndex, gameSettings.soundEnabled, gameSettings.hapticsEnabled]);
+  }, [konamiIndex, konamiUnlocked, gameSettings.soundEnabled, gameSettings.hapticsEnabled]);
 
   // Reset logo taps after delay
   useEffect(() => {
@@ -188,6 +224,32 @@ const Layout = () => {
         <div className="fixed inset-0 z-[100] pointer-events-none flex items-center justify-center">
           <div className="text-6xl animate-level-up">🦭✨</div>
           <div className="absolute inset-0 bg-gradient-to-r from-neon-pink/20 via-neon-purple/20 to-neon-cyan/20 animate-pulse" />
+        </div>
+      )}
+
+      {/* Konami Code Unlock Toast */}
+      {showKonamiToast && (
+        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[200] pointer-events-none">
+          <div className="bg-gradient-to-br from-purple-900 via-pink-900 to-cyan-900 border-4 border-neon-cyan p-6 rounded-2xl shadow-[0_0_60px_rgba(0,255,255,0.5)] animate-level-up">
+            <div className="text-center">
+              <div className="text-5xl mb-3">🎮✨</div>
+              <h3 className="text-2xl font-black text-white mb-2">KONAMI CODE!</h3>
+              <p className="text-neon-cyan font-bold mb-1">Secret Unlocked!</p>
+              <p className="text-white/70 text-sm">Retro Mode Activated</p>
+              <div className="mt-3 px-3 py-1 bg-neon-green/20 rounded-full inline-block">
+                <span className="text-neon-green text-sm font-bold">+200 XP</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Retro Mode Visual Effect (when unlocked) */}
+      {konamiUnlocked && (
+        <div className="fixed top-4 right-4 z-50 pointer-events-none">
+          <div className="px-2 py-1 bg-black/80 border border-neon-cyan rounded text-[10px] font-mono text-neon-cyan animate-pulse">
+            RETRO MODE
+          </div>
         </div>
       )}
 
@@ -575,13 +637,16 @@ const Layout = () => {
           'min-h-screen transition-all',
           'pt-[120px] lg:pt-16', // Mobile: header, Desktop: single row
           'lg:ml-72',
-          'pb-6'
+          'pb-24 lg:pb-6' // Extra padding on mobile for bottom nav
         )}
       >
         <div className="p-4 lg:p-6">
           <Outlet />
         </div>
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav />
     </div>
   );
 };
