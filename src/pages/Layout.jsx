@@ -15,6 +15,7 @@ import {
   BarChart3,
   Menu,
   X,
+  ClipboardCheck,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '../lib/utils';
@@ -39,6 +40,7 @@ const navItems = [
   { to: '/analytics', icon: BarChart3, label: 'Analytics', tagline: 'Measure the weird' },
   { to: '/activity', icon: Activity, label: 'Activity Log', tagline: 'The chaos trail' },
   { to: '/ai-trainer', icon: Bot, label: 'AI Trainer', tagline: 'Train the weird' },
+  { to: '/qa-checklist', icon: ClipboardCheck, label: 'QA Checklist', tagline: 'Test the weird' },
   { to: '/settings', icon: Settings, label: 'Settings', tagline: 'Configure chaos' },
 ];
 
