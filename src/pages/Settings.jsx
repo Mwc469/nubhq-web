@@ -1,8 +1,9 @@
-import { User, Bell, Shield, Palette, Loader2 } from 'lucide-react';
+import { User, Bell, Shield, Palette, Loader2, Sun, Moon } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { useSettings, useUpdateSettings } from '../hooks/useApi';
 import { useToast } from '../contexts/ToastContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 const SettingSection = ({ icon: Icon, title, description, children }) => (
   <Card className="space-y-4">
@@ -21,6 +22,7 @@ const SettingSection = ({ icon: Icon, title, description, children }) => (
 
 const Settings = () => {
   const toast = useToast();
+  const { theme, toggleTheme } = useTheme();
   const { data: settings, isLoading } = useSettings();
   const updateMutation = useUpdateSettings();
 
@@ -100,7 +102,30 @@ const Settings = () => {
           title="Appearance"
           description="Customize the look and feel of your dashboard"
         >
-          <p className="text-sm text-white/50">Dark mode is enabled by default</p>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={toggleTheme}
+              className={`flex items-center gap-2 px-4 py-2 border-3 border-black transition-colors ${
+                theme === 'dark'
+                  ? 'bg-brand-orange text-white'
+                  : 'bg-white/10 text-white/70 hover:bg-white/20'
+              }`}
+            >
+              <Moon size={18} />
+              <span>Dark</span>
+            </button>
+            <button
+              onClick={toggleTheme}
+              className={`flex items-center gap-2 px-4 py-2 border-3 border-black transition-colors ${
+                theme === 'light'
+                  ? 'bg-brand-orange text-white'
+                  : 'bg-white/10 text-white/70 hover:bg-white/20'
+              }`}
+            >
+              <Sun size={18} />
+              <span>Light</span>
+            </button>
+          </div>
         </SettingSection>
       </div>
     </div>

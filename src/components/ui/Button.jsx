@@ -13,6 +13,7 @@ const Button = forwardRef(({
     primary: 'bg-brand-orange text-white shadow-brutal hover:bg-orange-700',
     secondary: 'bg-white text-brand-dark shadow-brutal hover:bg-gray-100',
     ghost: 'bg-transparent text-white border-white/20 hover:bg-white/10',
+    danger: 'bg-red-500 text-white shadow-brutal hover:bg-red-600',
   };
 
   const sizes = {

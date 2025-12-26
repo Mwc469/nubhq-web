@@ -1,12 +1,19 @@
+import { useTheme } from '../../contexts/ThemeContext';
+
 const Card = ({
   children,
   className = '',
   padding = true,
   ...props
 }) => {
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
+
   return (
     <div
-      className={`bg-white/5 border-3 border-black shadow-brutal ${padding ? 'p-4' : ''} ${className}`}
+      className={`border-3 border-black shadow-brutal transition-colors ${
+        isLight ? 'bg-white' : 'bg-white/5'
+      } ${padding ? 'p-4' : ''} ${className}`}
       {...props}
     >
       {children}
@@ -20,11 +27,16 @@ const CardHeader = ({ children, className = '' }) => (
   </div>
 );
 
-const CardTitle = ({ children, className = '' }) => (
-  <h3 className={`text-lg font-bold text-white ${className}`}>
-    {children}
-  </h3>
-);
+const CardTitle = ({ children, className = '' }) => {
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
+
+  return (
+    <h3 className={`text-lg font-bold ${isLight ? 'text-gray-900' : 'text-white'} ${className}`}>
+      {children}
+    </h3>
+  );
+};
 
 const CardContent = ({ children, className = '' }) => (
   <div className={className}>
