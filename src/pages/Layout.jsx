@@ -344,15 +344,15 @@ const Layout = () => {
         )}
       </aside>
 
-      {/* Mobile Header */}
+      {/* Mobile Header - Clean & Simple */}
       <header
         className={cn(
           'lg:hidden fixed top-0 left-0 right-0 z-50 border-b-3 border-black',
           isLight ? 'bg-white/95 backdrop-blur-sm' : 'bg-brand-dark/95 backdrop-blur-sm'
         )}
       >
-        {/* Top row with XP */}
-        <div className="flex items-center justify-between p-3 border-b border-black/10">
+        <div className="flex items-center justify-between px-3 py-2">
+          {/* Left: Menu */}
           <button
             onClick={() => {
               if (gameSettings.soundEnabled) playSound('tap');
@@ -360,7 +360,7 @@ const Layout = () => {
               setMobileMenuOpen(!mobileMenuOpen);
             }}
             className={cn(
-              'p-2 rounded-xl transition-all active:scale-90',
+              'p-2.5 rounded-xl transition-all active:scale-90',
               mobileMenuOpen
                 ? 'bg-neon-pink text-white'
                 : isLight
@@ -368,41 +368,33 @@ const Layout = () => {
                 : 'hover:bg-white/10 text-white'
             )}
           >
-            {mobileMenuOpen ? <X size={24} /> : <Gamepad2 size={24} />}
+            {mobileMenuOpen ? <X size={22} /> : <Gamepad2 size={22} />}
           </button>
 
-          {/* Center: Logo + XP */}
-          <button onClick={handleLogoTap} className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg overflow-hidden border border-black">
+          {/* Center: Logo */}
+          <button
+            onClick={handleLogoTap}
+            className="flex items-center gap-2 active:scale-95 transition-transform"
+          >
+            <div className={cn(
+              'w-9 h-9 rounded-xl overflow-hidden border-2 border-black',
+              easterEggActive && 'animate-wiggle'
+            )}>
               <img src={BRAND_ASSETS.logos.screaming} alt="NUB" className="w-full h-full object-cover" />
             </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-sm">{levelInfo.badge}</span>
-              <div className="w-16">
-                <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full"
-                    style={{
-                      width: `${xpProgress}%`,
-                      background: 'linear-gradient(90deg, #E91E8C, #9B30FF)',
-                    }}
-                  />
-                </div>
-              </div>
-              {playerStats.streak > 0 && (
-                <span className="text-xs text-orange-500">🔥{playerStats.streak}</span>
-              )}
-            </div>
+            <span className={cn(
+              'font-black text-lg',
+              isLight ? 'text-gray-900' : 'text-white'
+            )}>
+              NubHQ
+            </span>
           </button>
 
-          <div className="flex items-center gap-2">
+          {/* Right: Notifications + Theme */}
+          <div className="flex items-center gap-1">
+            <Notifications />
             <ThemeToggle variant="compact" />
           </div>
-        </div>
-
-        {/* Bottom row - just notifications */}
-        <div className="flex items-center justify-center gap-2 p-2">
-          <Notifications />
         </div>
       </header>
 
@@ -422,7 +414,7 @@ const Layout = () => {
               'bg-gradient-to-br from-gray-900 via-purple-900/50 to-gray-900',
               'border-r-3 border-neon-pink/50'
             )}
-            style={{ paddingTop: '130px' }}
+            style={{ paddingTop: '70px' }}
           >
             {/* Cosmic glow effect */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -635,7 +627,7 @@ const Layout = () => {
       <main
         className={cn(
           'min-h-screen transition-all',
-          'pt-[120px] lg:pt-16', // Mobile: header, Desktop: single row
+          'pt-16 lg:pt-16', // Both mobile and desktop: single row header
           'lg:ml-72',
           'pb-24 lg:pb-6' // Extra padding on mobile for bottom nav
         )}
