@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, X, Clock, MessageSquare, Loader2, CheckSquare, Square, Sparkles } from 'lucide-react';
+import { Check, X, Clock, MessageSquare, Loader2, CheckSquare, Square, Sparkles, Gamepad2, Zap } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '../lib/utils';
 import NeoBrutalCard from '../components/ui/NeoBrutalCard';
@@ -10,13 +10,17 @@ import { Skeleton, SkeletonList } from '../components/ui/Skeleton';
 import { useApprovals, useApprove, useReject } from '../hooks/useApi';
 import { useToast } from '../contexts/ToastContext';
 import { useTheme } from '../contexts/ThemeContext';
+import { useInteraction } from '../hooks/useInteraction';
+import { useFloatingXp } from '../components/ui/FloatingXp';
+import { playSound } from '../lib/soundSystem';
 
 const ApprovalCard = ({ item, onApprove, onReject, isApproving, isRejecting, isSelected, onToggleSelect }) => {
   const { theme } = useTheme();
   const isLight = theme === 'light';
+  const { tap } = useInteraction();
 
   return (
-    <NeoBrutalCard accentColor="yellow" className="space-y-4">
+    <NeoBrutalCard accentColor="yellow" className="space-y-4 hover:scale-[1.01] transition-transform duration-200">
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
           <button
@@ -58,22 +62,29 @@ const ApprovalCard = ({ item, onApprove, onReject, isApproving, isRejecting, isS
         <NeoBrutalButton
           accentColor="green"
           size="sm"
-          onClick={() => onApprove(item.id)}
+          onClick={(e) => {
+            playSound('approve');
+            onApprove(item.id, e);
+          }}
           disabled={isApproving || isRejecting}
+          className="active:scale-95 transition-transform"
         >
           {isApproving ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
-          Approve
+          Ship It!
         </NeoBrutalButton>
         <NeoBrutalButton
           variant="outline"
           accentColor="pink"
           size="sm"
-          onClick={() => onReject(item.id)}
+          onClick={() => {
+            playSound('reject');
+            onReject(item.id);
+          }}
           disabled={isApproving || isRejecting}
-          className="text-red-400 border-red-400 hover:bg-red-400/10"
+          className="text-red-400 border-red-400 hover:bg-red-400/10 active:scale-95 transition-transform"
         >
           {isRejecting ? <Loader2 size={16} className="animate-spin" /> : <X size={16} />}
-          Reject
+          Nope
         </NeoBrutalButton>
       </div>
     </NeoBrutalCard>
@@ -88,32 +99,47 @@ const ApprovalQueue = () => {
   const { data: approvals, isLoading, error } = useApprovals('pending');
   const approveMutation = useApprove();
   const rejectMutation = useReject();
+  const { showXp } = useFloatingXp();
+  const { success, error: errorFeedback } = useInteraction();
 
-  const handleApprove = (id) => {
+  const handleApprove = (id, event) => {
     approveMutation.mutate(id, {
       onSuccess: () => {
-        toast.success('Message approved');
+        success();
+        // Show floating XP at click position
+        if (event?.clientX && event?.clientY) {
+          showXp(10, { x: `${event.clientX}px`, y: `${event.clientY}px` });
+        } else {
+          showXp(10);
+        }
+        toast.success('Shipped! +10 XP 🚀');
         setSelectedIds((prev) => {
           const next = new Set(prev);
           next.delete(id);
           return next;
         });
       },
-      onError: () => toast.error('Failed to approve message'),
+      onError: () => {
+        errorFeedback();
+        toast.error('Failed to ship that one');
+      },
     });
   };
 
   const handleReject = (id) => {
     rejectMutation.mutate(id, {
       onSuccess: () => {
-        toast.success('Message rejected');
+        toast.success('Rejected! The walrus approves your taste');
         setSelectedIds((prev) => {
           const next = new Set(prev);
           next.delete(id);
           return next;
         });
       },
-      onError: () => toast.error('Failed to reject message'),
+      onError: () => {
+        errorFeedback();
+        toast.error('Failed to reject');
+      },
     });
   };
 
@@ -139,6 +165,7 @@ const ApprovalQueue = () => {
 
   const handleBulkApprove = async () => {
     const ids = Array.from(selectedIds);
+    playSound('combo');
     for (const id of ids) {
       await new Promise((resolve) => {
         approveMutation.mutate(id, {
@@ -148,11 +175,13 @@ const ApprovalQueue = () => {
       });
     }
     setSelectedIds(new Set());
-    toast.success(`${ids.length} messages approved`);
+    showXp(ids.length * 10);
+    toast.success(`🔥 COMBO! ${ids.length} shipped! +${ids.length * 10} XP`);
   };
 
   const handleBulkReject = async () => {
     const ids = Array.from(selectedIds);
+    playSound('reject');
     for (const id of ids) {
       await new Promise((resolve) => {
         rejectMutation.mutate(id, {
@@ -162,7 +191,7 @@ const ApprovalQueue = () => {
       });
     }
     setSelectedIds(new Set());
-    toast.success(`${ids.length} messages rejected`);
+    toast.success(`${ids.length} items banished to the void`);
   };
 
   if (error) {
@@ -176,9 +205,9 @@ const ApprovalQueue = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        tagline="Quality Control"
+        tagline="Judge Thy Content"
         title="Approval Queue"
-        subtitle={isLoading ? 'Loading...' : `${approvals?.length ?? 0} items pending review`}
+        subtitle={isLoading ? 'Summoning items...' : approvals?.length ? `${approvals.length} items await your wisdom (+${approvals.length * 10} XP potential)` : 'The queue is empty...'}
       />
 
       {/* Bulk Actions Bar */}
@@ -188,21 +217,21 @@ const ApprovalQueue = () => {
             {selectedIds.size} selected
           </span>
           <div className="flex gap-3">
-            <NeoBrutalButton accentColor="green" size="sm" onClick={handleBulkApprove}>
-              <Check size={16} />
-              Approve All
+            <NeoBrutalButton accentColor="green" size="sm" onClick={handleBulkApprove} className="active:scale-95 transition-transform">
+              <Zap size={16} />
+              Ship All! (+{selectedIds.size * 10} XP)
             </NeoBrutalButton>
             <NeoBrutalButton
               variant="outline"
               size="sm"
               onClick={handleBulkReject}
-              className="text-red-400 border-red-400"
+              className="text-red-400 border-red-400 active:scale-95 transition-transform"
             >
               <X size={16} />
-              Reject All
+              Nuke 'Em
             </NeoBrutalButton>
             <NeoBrutalButton variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())}>
-              Cancel
+              Nevermind
             </NeoBrutalButton>
           </div>
         </NeoBrutalCard>
@@ -213,18 +242,30 @@ const ApprovalQueue = () => {
           <div className="text-center py-8">
             <Loader2 size={48} className="mx-auto text-neon-yellow mb-4 animate-spin" />
             <p className={cn('font-bold', isLight ? 'text-gray-500' : 'text-white/60')}>
-              Loading approvals...
+              Summoning content from the void...
             </p>
           </div>
         </NeoBrutalCard>
       ) : approvals?.length === 0 ? (
-        <NeoBrutalCard accentColor="green">
-          <EmptyState
-            icon={Check}
-            title="All caught up!"
-            description="No pending approvals at the moment. Time for a coffee break."
-            accentColor="green"
-          />
+        <NeoBrutalCard accentColor="green" className="relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-neon-green/5 to-transparent" />
+          <div className="relative text-center py-12">
+            <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-neon-green/20 flex items-center justify-center animate-[portal-breathe_3s_ease-in-out_infinite]">
+              <Sparkles size={40} className="text-neon-green" />
+            </div>
+            <h3 className={cn('text-2xl font-black mb-2', isLight ? 'text-gray-900' : 'text-white')}>
+              Victory is yours!
+            </h3>
+            <p className={cn('text-lg', isLight ? 'text-gray-500' : 'text-white/60')}>
+              The queue bows before your judgment. Go forth and create chaos elsewhere.
+            </p>
+            <div className="mt-6">
+              <NeoBrutalButton accentColor="green" onClick={() => window.location.href = '/game-queue'}>
+                <Gamepad2 size={18} />
+                Find More Quests
+              </NeoBrutalButton>
+            </div>
+          </div>
         </NeoBrutalCard>
       ) : (
         <>
