@@ -8,16 +8,19 @@ import {
   Video,
   CheckCircle,
   XCircle,
-  Clock,
   Brain,
-  Zap,
-  TrendingUp,
   Film,
   Loader2,
-  Play,
   RefreshCw,
   Sparkles,
   Activity,
+  Plus,
+  Trash2,
+  Edit3,
+  X,
+  Save,
+  Layers,
+  History,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '../lib/utils';
@@ -354,10 +357,267 @@ const ReviewQueue = ({ videos, isLoading, onApprove, onReject }) => {
   );
 };
 
-// Templates Card
-const TemplatesCard = ({ templates, isLoading }) => {
+// Template Editor Modal
+const TemplateEditor = ({ template, onSave, onClose, isLight }) => {
+  const [form, setForm] = useState({
+    id: template?.id || '',
+    name: template?.name || '',
+    duration: template?.duration || 30,
+    aspect: template?.aspect || '9:16',
+    segments: template?.segments || [
+      { type: 'hook', duration: 3 },
+      { type: 'highlight', duration: 22 },
+      { type: 'cta', duration: 5 },
+    ],
+  });
+  const [saving, setSaving] = useState(false);
+
+  const segmentTypes = ['hook', 'intro', 'highlight', 'outro', 'cta'];
+  const aspectOptions = ['16:9', '9:16', '1:1', '4:5'];
+
+  const handleAddSegment = () => {
+    setForm(prev => ({
+      ...prev,
+      segments: [...prev.segments, { type: 'highlight', duration: 10 }],
+    }));
+  };
+
+  const handleRemoveSegment = (index) => {
+    setForm(prev => ({
+      ...prev,
+      segments: prev.segments.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleSegmentChange = (index, field, value) => {
+    setForm(prev => ({
+      ...prev,
+      segments: prev.segments.map((seg, i) =>
+        i === index ? { ...seg, [field]: field === 'duration' ? parseInt(value) || 0 : value } : seg
+      ),
+    }));
+  };
+
+  const handleSave = async () => {
+    if (!form.id || !form.name) return;
+    setSaving(true);
+    try {
+      await onSave(form, !!template);
+      onClose();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const totalDuration = form.segments.reduce((sum, s) => sum + s.duration, 0);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        onClick={e => e.stopPropagation()}
+        className={cn(
+          'w-full max-w-lg rounded-2xl border-2 p-6 space-y-4',
+          isLight ? 'bg-white border-gray-200' : 'bg-gray-900 border-white/20'
+        )}
+      >
+        <div className="flex items-center justify-between">
+          <h2 className={cn('text-xl font-black', isLight ? 'text-gray-900' : 'text-white')}>
+            {template ? 'Edit Template' : 'Create Template'}
+          </h2>
+          <button onClick={onClose} className={cn('p-2 rounded-lg', isLight ? 'hover:bg-gray-100' : 'hover:bg-white/10')}>
+            <X size={20} className={isLight ? 'text-gray-500' : 'text-white/50'} />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className={cn('block text-xs font-bold mb-1', isLight ? 'text-gray-600' : 'text-white/70')}>
+              Template ID
+            </label>
+            <input
+              type="text"
+              value={form.id}
+              onChange={e => setForm(prev => ({ ...prev, id: e.target.value.toLowerCase().replace(/\s/g, '-') }))}
+              disabled={!!template}
+              className={cn(
+                'w-full px-3 py-2 rounded-lg border-2 text-sm',
+                isLight ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-white/5 border-white/10 text-white',
+                template && 'opacity-50 cursor-not-allowed'
+              )}
+              placeholder="my-template"
+            />
+          </div>
+          <div>
+            <label className={cn('block text-xs font-bold mb-1', isLight ? 'text-gray-600' : 'text-white/70')}>
+              Name
+            </label>
+            <input
+              type="text"
+              value={form.name}
+              onChange={e => setForm(prev => ({ ...prev, name: e.target.value }))}
+              className={cn(
+                'w-full px-3 py-2 rounded-lg border-2 text-sm',
+                isLight ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-white/5 border-white/10 text-white'
+              )}
+              placeholder="My Template"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className={cn('block text-xs font-bold mb-1', isLight ? 'text-gray-600' : 'text-white/70')}>
+              Target Duration (s)
+            </label>
+            <input
+              type="number"
+              value={form.duration}
+              onChange={e => setForm(prev => ({ ...prev, duration: parseInt(e.target.value) || 0 }))}
+              className={cn(
+                'w-full px-3 py-2 rounded-lg border-2 text-sm',
+                isLight ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-white/5 border-white/10 text-white'
+              )}
+            />
+          </div>
+          <div>
+            <label className={cn('block text-xs font-bold mb-1', isLight ? 'text-gray-600' : 'text-white/70')}>
+              Aspect Ratio
+            </label>
+            <select
+              value={form.aspect}
+              onChange={e => setForm(prev => ({ ...prev, aspect: e.target.value }))}
+              className={cn(
+                'w-full px-3 py-2 rounded-lg border-2 text-sm',
+                isLight ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-white/5 border-white/10 text-white'
+              )}
+            >
+              {aspectOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className={cn('text-xs font-bold', isLight ? 'text-gray-600' : 'text-white/70')}>
+              Segments ({totalDuration}s total)
+            </label>
+            <button
+              onClick={handleAddSegment}
+              className={cn(
+                'text-xs px-2 py-1 rounded-lg flex items-center gap-1',
+                'bg-neon-cyan/20 text-neon-cyan hover:bg-neon-cyan/30'
+              )}
+            >
+              <Plus size={12} /> Add
+            </button>
+          </div>
+          <div className="space-y-2 max-h-40 overflow-y-auto">
+            {form.segments.map((seg, i) => (
+              <div key={i} className={cn(
+                'flex items-center gap-2 p-2 rounded-lg',
+                isLight ? 'bg-gray-50' : 'bg-white/5'
+              )}>
+                <select
+                  value={seg.type}
+                  onChange={e => handleSegmentChange(i, 'type', e.target.value)}
+                  className={cn(
+                    'flex-1 px-2 py-1 rounded text-xs border',
+                    isLight ? 'bg-white border-gray-200' : 'bg-gray-800 border-white/10 text-white'
+                  )}
+                >
+                  {segmentTypes.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+                <input
+                  type="number"
+                  value={seg.duration}
+                  onChange={e => handleSegmentChange(i, 'duration', e.target.value)}
+                  className={cn(
+                    'w-16 px-2 py-1 rounded text-xs border text-center',
+                    isLight ? 'bg-white border-gray-200' : 'bg-gray-800 border-white/10 text-white'
+                  )}
+                />
+                <span className={cn('text-xs', isLight ? 'text-gray-400' : 'text-white/30')}>sec</span>
+                <button
+                  onClick={() => handleRemoveSegment(i)}
+                  className="p-1 text-red-400 hover:text-red-300"
+                  disabled={form.segments.length <= 1}
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex gap-3 pt-2">
+          <NeoBrutalButton variant="outline" onClick={onClose} className="flex-1">
+            Cancel
+          </NeoBrutalButton>
+          <NeoBrutalButton
+            accentColor="cyan"
+            onClick={handleSave}
+            disabled={saving || !form.id || !form.name}
+            className="flex-1"
+          >
+            {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+            {template ? 'Update' : 'Create'}
+          </NeoBrutalButton>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
+
+// Templates Card with CRUD
+const TemplatesCard = ({ templates, isLoading, onRefresh }) => {
   const { theme } = useTheme();
   const isLight = theme === 'light';
+  const { showToast } = useToast();
+  const [editingTemplate, setEditingTemplate] = useState(null);
+  const [showEditor, setShowEditor] = useState(false);
+
+  const handleSaveTemplate = async (form, isEdit) => {
+    try {
+      const url = isEdit
+        ? `${API_BASE}/api/video-pipeline/templates/${form.id}`
+        : `${API_BASE}/api/video-pipeline/templates`;
+
+      await fetchWithAuth(url, {
+        method: isEdit ? 'PUT' : 'POST',
+        body: JSON.stringify(form),
+      });
+
+      playSound('approve');
+      showToast(isEdit ? 'Template updated!' : 'Template created!', 'success');
+      onRefresh();
+    } catch (error) {
+      showToast('Failed to save template', 'error');
+      throw error;
+    }
+  };
+
+  const handleDeleteTemplate = async (id) => {
+    if (!confirm(`Delete template "${id}"?`)) return;
+    try {
+      await fetchWithAuth(`${API_BASE}/api/video-pipeline/templates/${id}`, {
+        method: 'DELETE',
+      });
+      playSound('reject');
+      showToast('Template deleted', 'info');
+      onRefresh();
+    } catch (error) {
+      showToast('Failed to delete template', 'error');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -368,41 +628,207 @@ const TemplatesCard = ({ templates, isLoading }) => {
     );
   }
 
+  // Separate built-in and custom templates
+  const builtIn = templates?.filter(t => !t.is_custom) || [];
+  const custom = templates?.filter(t => t.is_custom) || [];
+
   return (
-    <NeoBrutalCard accentColor="orange" className="space-y-4">
+    <>
+      <NeoBrutalCard accentColor="orange" className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-neon-orange/20 flex items-center justify-center">
+              <Layers size={20} className="text-neon-orange" />
+            </div>
+            <div>
+              <h3 className={cn('font-bold', isLight ? 'text-gray-900' : 'text-white')}>
+                Video Templates
+              </h3>
+              <p className={cn('text-xs', isLight ? 'text-gray-500' : 'text-white/50')}>
+                {templates?.length || 0} templates available
+              </p>
+            </div>
+          </div>
+          <NeoBrutalButton
+            size="sm"
+            accentColor="cyan"
+            onClick={() => { setEditingTemplate(null); setShowEditor(true); }}
+          >
+            <Plus size={14} /> New
+          </NeoBrutalButton>
+        </div>
+
+        {/* Built-in Templates */}
+        <div>
+          <p className={cn('text-xs font-bold mb-2', isLight ? 'text-gray-500' : 'text-white/50')}>
+            Built-in
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+            {builtIn.map((template) => (
+              <div
+                key={template.id}
+                className={cn(
+                  'p-3 rounded-xl text-center',
+                  isLight ? 'bg-gray-50' : 'bg-white/5'
+                )}
+              >
+                <div className={cn('font-bold text-sm', isLight ? 'text-gray-900' : 'text-white')}>
+                  {template.name}
+                </div>
+                <div className={cn('text-xs', isLight ? 'text-gray-500' : 'text-white/50')}>
+                  {template.duration}s • {template.aspect}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Custom Templates */}
+        {custom.length > 0 && (
+          <div>
+            <p className={cn('text-xs font-bold mb-2', isLight ? 'text-gray-500' : 'text-white/50')}>
+              Custom
+            </p>
+            <div className="space-y-2">
+              {custom.map((template) => (
+                <div
+                  key={template.id}
+                  className={cn(
+                    'p-3 rounded-xl flex items-center justify-between',
+                    isLight ? 'bg-orange-50 border border-orange-200' : 'bg-neon-orange/10 border border-neon-orange/20'
+                  )}
+                >
+                  <div>
+                    <div className={cn('font-bold text-sm', isLight ? 'text-gray-900' : 'text-white')}>
+                      {template.name}
+                    </div>
+                    <div className={cn('text-xs', isLight ? 'text-gray-500' : 'text-white/50')}>
+                      {template.duration}s • {template.aspect} • {template.segments} segments
+                    </div>
+                  </div>
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => { setEditingTemplate(template); setShowEditor(true); }}
+                      className={cn('p-2 rounded-lg', isLight ? 'hover:bg-orange-100' : 'hover:bg-white/10')}
+                    >
+                      <Edit3 size={14} className="text-neon-orange" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteTemplate(template.id)}
+                      className={cn('p-2 rounded-lg', isLight ? 'hover:bg-red-100' : 'hover:bg-red-500/10')}
+                    >
+                      <Trash2 size={14} className="text-red-400" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </NeoBrutalCard>
+
+      <AnimatePresence>
+        {showEditor && (
+          <TemplateEditor
+            template={editingTemplate}
+            onSave={handleSaveTemplate}
+            onClose={() => setShowEditor(false)}
+            isLight={isLight}
+          />
+        )}
+      </AnimatePresence>
+    </>
+  );
+};
+
+// Activity History Card
+const ActivityHistory = ({ isLoading }) => {
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
+  const [activities, setActivities] = useState([]);
+  const [loadingActivities, setLoadingActivities] = useState(true);
+
+  useEffect(() => {
+    const fetchActivities = async () => {
+      try {
+        const data = await fetchWithAuth(`${API_BASE}/api/video-pipeline/activity?limit=10`);
+        setActivities(data.activities || []);
+      } catch (error) {
+        // Fallback to empty if endpoint not available
+        setActivities([]);
+      } finally {
+        setLoadingActivities(false);
+      }
+    };
+    fetchActivities();
+  }, []);
+
+  if (isLoading || loadingActivities) {
+    return (
+      <NeoBrutalCard accentColor="purple" className="space-y-4">
+        <Skeleton className="h-6 w-32" />
+        <Skeleton className="h-20 w-full" />
+      </NeoBrutalCard>
+    );
+  }
+
+  return (
+    <NeoBrutalCard accentColor="purple" className="space-y-4">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-neon-orange/20 flex items-center justify-center">
-          <Play size={20} className="text-neon-orange" />
+        <div className="w-10 h-10 rounded-xl bg-neon-purple/20 flex items-center justify-center">
+          <History size={20} className="text-neon-purple" />
         </div>
         <div>
           <h3 className={cn('font-bold', isLight ? 'text-gray-900' : 'text-white')}>
-            Video Templates
+            Recent Activity
           </h3>
           <p className={cn('text-xs', isLight ? 'text-gray-500' : 'text-white/50')}>
-            Ready-to-use formats
+            What's been happening
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-        {templates?.map((template) => (
-          <div
-            key={template.id}
-            className={cn(
-              'p-3 rounded-xl text-center',
-              isLight ? 'bg-gray-50 hover:bg-gray-100' : 'bg-white/5 hover:bg-white/10',
-              'transition-colors cursor-pointer'
-            )}
-          >
-            <div className={cn('font-bold text-sm', isLight ? 'text-gray-900' : 'text-white')}>
-              {template.name}
+      {activities.length === 0 ? (
+        <div className={cn(
+          'p-6 rounded-xl text-center',
+          isLight ? 'bg-gray-50' : 'bg-white/5'
+        )}>
+          <History className={cn('w-8 h-8 mx-auto mb-2', isLight ? 'text-gray-300' : 'text-white/20')} />
+          <p className={cn('text-sm', isLight ? 'text-gray-500' : 'text-white/50')}>
+            No recent activity
+          </p>
+          <p className={cn('text-xs mt-1', isLight ? 'text-gray-400' : 'text-white/30')}>
+            Activities will appear as you process videos
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {activities.map(activity => (
+            <div
+              key={activity.id}
+              className={cn(
+                'flex items-center gap-3 p-3 rounded-lg',
+                isLight ? 'bg-gray-50' : 'bg-white/5'
+              )}
+            >
+              <div className="w-8 h-8 rounded-lg bg-neon-purple/20 flex items-center justify-center">
+                <Video size={14} className="text-neon-purple" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className={cn('text-sm font-medium truncate', isLight ? 'text-gray-900' : 'text-white')}>
+                  {activity.action}
+                </p>
+                <p className={cn('text-xs truncate', isLight ? 'text-gray-500' : 'text-white/50')}>
+                  {activity.name}
+                </p>
+              </div>
+              <span className={cn('text-xs flex-shrink-0', isLight ? 'text-gray-400' : 'text-white/30')}>
+                {formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true })}
+              </span>
             </div>
-            <div className={cn('text-xs', isLight ? 'text-gray-500' : 'text-white/50')}>
-              {template.duration}s • {template.aspect}
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </NeoBrutalCard>
   );
 };
@@ -470,7 +896,7 @@ const VideoPipeline = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <PageHeader
-          title="Video Pipeline"
+          title="Video Lab"
           subtitle="Your content factory at a glance"
           icon={Video}
           accentColor="cyan"
@@ -491,6 +917,7 @@ const VideoPipeline = () => {
         <div className="space-y-6">
           <PipelineStatus health={health} isLoading={loading} />
           <LearningStats stats={stats} isLoading={loading} />
+          <ActivityHistory isLoading={loading} />
         </div>
 
         {/* Right Column */}
@@ -501,7 +928,7 @@ const VideoPipeline = () => {
             onApprove={handleApprove}
             onReject={handleReject}
           />
-          <TemplatesCard templates={templates} isLoading={loading} />
+          <TemplatesCard templates={templates} isLoading={loading} onRefresh={fetchData} />
         </div>
       </div>
     </div>
