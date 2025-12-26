@@ -1,6 +1,23 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
+import { getLoadingMessage } from '@/lib/personality';
+
+// Fun loading messages that rotate
+const WALRUS_LOADING_TIPS = [
+  "The walrus is thinking...",
+  "Doing walrus things...",
+  "Summoning content from the void...",
+  "Consulting the chaos gods...",
+  "Warming up the weird machine...",
+  "Hold tight, we're being weird...",
+  "Manifesting pixels...",
+  "Teaching the otter to fetch...",
+  "Brewing digital chaos...",
+  "Asking the cactus for advice...",
+  "Vibing sensually...",
+  "Loading the weirdness...",
+];
 
 /**
  * Skeleton - Animated placeholder while content loads
@@ -197,14 +214,30 @@ export function LoadingOverlay({ message, isFullScreen = false }) {
 }
 
 /**
- * LoadingPage - Full page loading state
+ * LoadingPage - Full page loading state with rotating walrus messages
  */
-export function LoadingPage({ message = "Loading..." }) {
+export function LoadingPage({ message, rotateMessages = true }) {
+  const [currentMessage, setCurrentMessage] = useState(
+    message || WALRUS_LOADING_TIPS[0]
+  );
+
+  useEffect(() => {
+    if (!rotateMessages || message) return;
+
+    const interval = setInterval(() => {
+      setCurrentMessage(
+        WALRUS_LOADING_TIPS[Math.floor(Math.random() * WALRUS_LOADING_TIPS.length)]
+      );
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, [rotateMessages, message]);
+
   return (
     <div className="min-h-[50vh] flex items-center justify-center">
       <div className="text-center space-y-4">
         <div className="text-6xl animate-bounce">🦦</div>
-        <LoadingSpinner message={message} />
+        <LoadingSpinner message={currentMessage} />
       </div>
     </div>
   );

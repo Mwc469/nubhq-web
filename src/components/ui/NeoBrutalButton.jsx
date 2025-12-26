@@ -62,11 +62,16 @@ const NeoBrutalButton = forwardRef(({
     <button
       ref={ref}
       className={cn(
-        'inline-flex items-center justify-center font-bold rounded-xl border-3 transition-all duration-150',
+        'inline-flex items-center justify-center font-bold rounded-xl border-3',
+        'transition-all duration-150 ease-out',
         'focus:outline-none focus-visible:ring-4 focus-visible:ring-offset-2',
-        'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
-        'hover:translate-x-[-2px] hover:translate-y-[-2px]',
-        'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-none',
+        // Hover: lift up and left
+        'hover:translate-x-[-2px] hover:translate-y-[-2px] hover:scale-[1.02]',
+        // Active: squish down with scale
+        'active:translate-x-[2px] active:translate-y-[2px] active:scale-[0.98] active:shadow-none',
+        // Disabled state
+        'disabled:opacity-50 disabled:cursor-not-allowed',
+        'disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:scale-100 disabled:hover:shadow-none',
         sizes[size],
         variantStyle,
         className

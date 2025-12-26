@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import Layout from './pages/Layout'
 import NubSpinner from './components/ui/NubSpinner'
 import ProtectedRoute from './components/ProtectedRoute'
+import AmbientEventLayer from './components/ui/AmbientEventLayer'
 
 // Lazy load pages - simplified to core approval experience
 const Portal = lazy(() => import('./pages/Portal'))
@@ -71,9 +72,12 @@ function AnimatedRoutes() {
 
 function App() {
   return (
-    <Suspense fallback={<PageLoader />}>
-      <AnimatedRoutes />
-    </Suspense>
+    <>
+      <Suspense fallback={<PageLoader />}>
+        <AnimatedRoutes />
+      </Suspense>
+      <AmbientEventLayer />
+    </>
   )
 }
 

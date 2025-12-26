@@ -54,15 +54,18 @@ export default function NeoBrutalCard({
   return (
     <div
       className={cn(
-        'rounded-2xl border-3 p-6 transition-all duration-200',
+        'rounded-2xl border-3 p-6 transition-all duration-200 ease-out',
         isLight ? 'bg-white text-gray-900' : 'bg-gray-900 text-white',
         colors.border,
         colors.shadow,
         hover && [
-          'hover:translate-x-[-2px] hover:translate-y-[-2px]',
+          'hover:translate-x-[-2px] hover:translate-y-[-2px] hover:scale-[1.01]',
           colors.hoverShadow,
         ],
-        onClick && 'cursor-pointer',
+        onClick && [
+          'cursor-pointer',
+          'active:translate-x-[2px] active:translate-y-[2px] active:scale-[0.99] active:shadow-none',
+        ],
         className
       )}
       onClick={onClick}
