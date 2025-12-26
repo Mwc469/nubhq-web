@@ -2,8 +2,8 @@ import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import NubSpinner from './ui/NubSpinner'
 
-// TODO: Set to false to re-enable authentication
-const DISABLE_AUTH = true
+// Authentication is enabled in production
+const DISABLE_AUTH = false
 
 export default function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth()

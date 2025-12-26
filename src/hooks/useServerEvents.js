@@ -5,6 +5,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { toast } from 'sonner';
+import { logger } from '../lib/logger';
 
 const API_BASE = (import.meta?.env?.VITE_API_BASE_URL || 'http://localhost:8000').replace(/\/$/, '');
 
@@ -75,7 +76,7 @@ export function useServerEvents(topics = ['all'], handlers = {}, options = {}) {
       };
 
       eventSource.onerror = (error) => {
-        console.error('SSE Error:', error);
+        logger.error('SSE Error:', error);
         setConnectionState(ConnectionState.ERROR);
         eventSource.close();
         eventSourceRef.current = null;
@@ -86,7 +87,7 @@ export function useServerEvents(topics = ['all'], handlers = {}, options = {}) {
           reconnectAttempts.current++;
           const delay = reconnectDelay * Math.pow(2, reconnectAttempts.current - 1);
           
-          console.log(`SSE reconnecting in ${delay}ms (attempt ${reconnectAttempts.current}/${maxReconnectAttempts})`);
+          logger.log(`SSE reconnecting in ${delay}ms (attempt ${reconnectAttempts.current}/${maxReconnectAttempts})`);
           
           reconnectTimeoutRef.current = setTimeout(() => {
             connect();
@@ -112,7 +113,7 @@ export function useServerEvents(topics = ['all'], handlers = {}, options = {}) {
           // Call wildcard handler if exists
           handlersRef.current['*']?.(data.type, data.data, data);
         } catch (e) {
-          console.error('Error parsing SSE event:', e);
+          logger.error('Error parsing SSE event:', e);
         }
       };
 
@@ -126,13 +127,13 @@ export function useServerEvents(topics = ['all'], handlers = {}, options = {}) {
             setLastEvent(data);
             handlersRef.current[eventType]?.(data.data, data);
           } catch (e) {
-            console.error(`Error parsing ${eventType} event:`, e);
+            logger.error(`Error parsing ${eventType} event:`, e);
           }
         });
       });
 
     } catch (error) {
-      console.error('Failed to create EventSource:', error);
+      logger.error('Failed to create EventSource:', error);
       setConnectionState(ConnectionState.ERROR);
       onError?.(error);
     }

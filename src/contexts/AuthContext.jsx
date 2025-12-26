@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
+import { logger } from '../lib/logger'
 
 const AuthContext = createContext(null)
 
@@ -86,7 +87,7 @@ export function AuthProvider({ children }) {
         storeTokens(data.access_token, data.refresh_token)
         return data.access_token
       } catch (error) {
-        console.error('Token refresh failed:', error)
+        logger.error('Token refresh failed:', error)
         clearTokens()
         return null
       } finally {
@@ -150,7 +151,7 @@ export function AuthProvider({ children }) {
           clearTokens()
         }
       } catch (error) {
-        console.error('Failed to fetch user:', error)
+        logger.error('Failed to fetch user:', error)
         clearTokens()
       } finally {
         setLoading(false)

@@ -6,6 +6,7 @@ import { ToastProvider } from './contexts/ToastContext'
 import { AuthProvider } from './contexts/AuthContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { FloatingXpProvider } from './components/ui/FloatingXp'
+import { logger } from './lib/logger'
 import './index.css'
 import App from './App.jsx'
 
@@ -41,10 +42,10 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
-        console.log('SW registered:', registration.scope)
+        logger.log('SW registered:', registration.scope)
       })
       .catch((error) => {
-        console.log('SW registration failed:', error)
+        logger.error('SW registration failed:', error)
       })
   })
 }
