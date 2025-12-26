@@ -1,33 +1,22 @@
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
-  CheckSquare,
   Calendar,
   Bot,
   Mail,
   Settings,
   LogOut,
-  Image,
-  PenTool,
-  Video,
-  FileText,
-  Activity,
-  BarChart3,
+  MessageSquare,
   Menu,
   X,
-  ClipboardCheck,
   Gamepad2,
   Zap,
   Flame,
 } from 'lucide-react';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { cn } from '../lib/utils';
-import GlobalSearch from '../components/layout/GlobalSearch';
-import QuickCreate from '../components/layout/QuickCreate';
 import ThemeToggle from '../components/layout/ThemeToggle';
-import DryRunBadge from '../components/ui/DryRunBadge';
 import Notifications from '../components/Notifications';
-import MobileNav from '../components/mobile/MobileNav';
 import { CosmicGlow } from '../components/ui/CosmicBackground';
 import { BRAND_ASSETS } from '../lib/brandAssets';
 import { LEVELS } from '../lib/gamification';
@@ -66,62 +55,36 @@ function getLevelInfo(xp) {
   return LEVELS[0];
 }
 
-// Game menu categories - organized like a game menu, not a productivity app
+// Simplified menu - only 4 core tasks + settings
 const menuCategories = [
   {
-    title: '🎮 QUESTS',
-    subtitle: 'Earn XP doing these',
+    title: '🎮 PLAY',
+    subtitle: 'Earn XP making decisions',
     items: [
-      { to: '/game-queue', icon: Gamepad2, label: 'Play Now', tagline: 'Swipe to decide', color: 'purple', xp: '+10-25 XP', hot: true },
-      { to: '/approvals', icon: CheckSquare, label: 'Judge', tagline: 'Approve the chaos', color: 'green', xp: '+10 XP' },
-      { to: '/ai-trainer', icon: Bot, label: 'Train AI', tagline: 'Teach your voice', color: 'cyan', xp: '+15 XP' },
+      { to: '/play/schedule', icon: Calendar, label: 'Schedule It', tagline: 'Approve posts for feed', color: 'pink', xp: '+10 XP', hot: true },
+      { to: '/play/email', icon: Mail, label: 'Email Blast', tagline: 'Approve for newsletter', color: 'cyan', xp: '+10 XP' },
+      { to: '/play/replies', icon: MessageSquare, label: 'Reply Review', tagline: 'Approve responses', color: 'purple', xp: '+15 XP' },
+      { to: '/train', icon: Bot, label: 'Train Brain', tagline: 'Make AI smarter', color: 'orange', xp: '+15 XP' },
     ]
   },
   {
-    title: '✨ CREATE',
-    subtitle: 'Make weird stuff',
-    items: [
-      { to: '/post-studio', icon: PenTool, label: 'Post', tagline: 'Write something', color: 'pink' },
-      { to: '/video-studio', icon: Video, label: 'Video', tagline: 'Motion magic', color: 'orange' },
-      { to: '/email-campaigns', icon: Mail, label: 'Email', tagline: 'Fan signals', color: 'yellow' },
-    ]
-  },
-  {
-    title: '🗺️ EXPLORE',
-    subtitle: 'See what\'s happening',
+    title: '⚙️ MORE',
+    subtitle: '',
     items: [
       { to: '/', icon: LayoutDashboard, label: 'Hub', tagline: 'Home base', color: 'pink' },
-      { to: '/calendar', icon: Calendar, label: 'Calendar', tagline: 'Plot the chaos', color: 'yellow' },
-      { to: '/media', icon: Image, label: 'Media', tagline: 'Visual vault', color: 'orange' },
-      { to: '/analytics', icon: BarChart3, label: 'Stats', tagline: 'Chaos metrics', color: 'cyan' },
-      { to: '/activity', icon: Activity, label: 'Activity', tagline: 'Trail of chaos', color: 'purple' },
-    ]
-  },
-  {
-    title: '⚙️ CONFIG',
-    subtitle: 'Tune the weird',
-    items: [
-      { to: '/templates', icon: FileText, label: 'Templates', tagline: 'Blueprints', color: 'green' },
       { to: '/settings', icon: Settings, label: 'Settings', tagline: 'Your preferences', color: 'neutral' },
     ]
   }
 ];
 
-// Flat nav items for desktop sidebar (keep simpler)
+// Simple nav for desktop sidebar
 const navItems = [
-  { to: '/', icon: LayoutDashboard, label: 'Hub', tagline: 'Command Center', color: 'pink' },
-  { to: '/game-queue', icon: Gamepad2, label: 'Play', tagline: 'Swipe & Decide', color: 'purple' },
-  { to: '/post-studio', icon: PenTool, label: 'Create', tagline: 'Make Weird Stuff', color: 'cyan' },
-  { to: '/calendar', icon: Calendar, label: 'Calendar', tagline: 'Plot the Chaos', color: 'yellow' },
-  { to: '/approvals', icon: CheckSquare, label: 'Approvals', tagline: 'Judge the Queue', color: 'green' },
-  { to: '/media', icon: Image, label: 'Media', tagline: 'Visual Vault', color: 'orange' },
-  { to: '/ai-trainer', icon: Bot, label: 'Train AI', tagline: 'Teach the Weird', color: 'purple' },
-  { to: '/analytics', icon: BarChart3, label: 'Stats', tagline: 'Measure Chaos', color: 'cyan' },
-  { to: '/video-studio', icon: Video, label: 'Video', tagline: 'Motion Magic', color: 'pink' },
-  { to: '/email-campaigns', icon: Mail, label: 'Email', tagline: 'Fan Signals', color: 'yellow' },
-  { to: '/templates', icon: FileText, label: 'Templates', tagline: 'Weird Blueprints', color: 'green' },
-  { to: '/activity', icon: Activity, label: 'Activity', tagline: 'Chaos Trail', color: 'orange' },
-  { to: '/settings', icon: Settings, label: 'Settings', tagline: 'Tune the Weird', color: 'neutral' },
+  { to: '/', icon: LayoutDashboard, label: 'Hub', tagline: 'Home Base', color: 'pink' },
+  { to: '/play/schedule', icon: Calendar, label: 'Schedule It', tagline: 'Approve Posts', color: 'pink' },
+  { to: '/play/email', icon: Mail, label: 'Email Blast', tagline: 'Newsletter', color: 'cyan' },
+  { to: '/play/replies', icon: MessageSquare, label: 'Reply Review', tagline: 'Responses', color: 'purple' },
+  { to: '/train', icon: Bot, label: 'Train Brain', tagline: 'Teach AI', color: 'orange' },
+  { to: '/settings', icon: Settings, label: 'Settings', tagline: 'Preferences', color: 'neutral' },
 ];
 
 const colorMap = {
@@ -375,10 +338,8 @@ const Layout = () => {
           </div>
         </div>
 
-        {/* Bottom row */}
-        <div className="flex items-center gap-2 p-3">
-          <GlobalSearch compact />
-          <QuickCreate variant="compact" />
+        {/* Bottom row - just notifications */}
+        <div className="flex items-center justify-center gap-2 p-2">
           <Notifications />
         </div>
       </header>
@@ -599,14 +560,10 @@ const Layout = () => {
             </div>
           )}
 
-          <div className="w-px h-8 bg-gray-200 dark:bg-gray-700 mx-2" />
-          <GlobalSearch />
         </div>
 
         {/* Right: Actions */}
         <div className="flex items-center gap-3">
-          <DryRunBadge />
-          <QuickCreate />
           <Notifications />
           <ThemeToggle />
         </div>
@@ -616,18 +573,15 @@ const Layout = () => {
       <main
         className={cn(
           'min-h-screen transition-all',
-          'pt-[140px] lg:pt-16', // Mobile: 2-row header, Desktop: single row
+          'pt-[120px] lg:pt-16', // Mobile: header, Desktop: single row
           'lg:ml-72',
-          'pb-20 lg:pb-0'
+          'pb-6'
         )}
       >
         <div className="p-4 lg:p-6">
           <Outlet />
         </div>
       </main>
-
-      {/* Mobile Bottom Navigation */}
-      <MobileNav />
     </div>
   );
 };
