@@ -117,3 +117,38 @@ export function useDeleteScheduledPost() {
     },
   });
 }
+
+// AI Trainer
+export function useTrainingStats() {
+  return useQuery({
+    queryKey: ['ai-trainer', 'stats'],
+    queryFn: () => api.get('/ai-trainer/stats'),
+  });
+}
+
+export function useTrainingExamples(category = null) {
+  return useQuery({
+    queryKey: ['ai-trainer', 'examples', category],
+    queryFn: () => api.get(`/ai-trainer/examples${category ? `?category=${category}` : ''}`),
+  });
+}
+
+export function useCreateTrainingExample() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data) => api.post('/ai-trainer/examples', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ai-trainer'] });
+    },
+  });
+}
+
+export function useDeleteTrainingExample() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id) => api.delete(`/ai-trainer/examples/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ai-trainer'] });
+    },
+  });
+}
