@@ -2,6 +2,7 @@ import { Suspense, lazy } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Layout from './pages/Layout'
 import NubSpinner from './components/ui/NubSpinner'
+import ProtectedRoute from './components/ProtectedRoute'
 
 // Lazy load all pages for code splitting
 const Dashboard = lazy(() => import('./pages/Dashboard'))
@@ -34,7 +35,7 @@ function App() {
     <Suspense fallback={<PageLoader />}>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/" element={<Layout />}>
+        <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route index element={<Dashboard />} />
           <Route path="approvals" element={<ApprovalQueue />} />
           <Route path="calendar" element={<ContentCalendar />} />
