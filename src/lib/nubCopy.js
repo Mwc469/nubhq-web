@@ -40,6 +40,14 @@ export const EMPTY_STATES = {
     { title: "Tumbleweeds...", message: "Your drafts folder is emptier than our bank account after buying gear." },
     { title: "The void stares back", message: "No drafts found. The chaos won't create itself, ya know." },
     { title: "Ghost town 👻", message: "Not a single draft. Did you come here just to look at buttons?" },
+    { title: "Echo... echo...", message: "Your drafts folder is so empty, my voice is bouncing off the walls." },
+    { title: "Suspiciously empty", message: "Did you eat all your drafts? That's not how content works." },
+  ],
+  training: [
+    { title: "No training data!", message: "Your AI is literally just guessing. Wild strategy." },
+    { title: "Brain empty 🧠", message: "The AI has learned nothing. It's like us in school." },
+    { title: "Untrained chaos", message: "Without training, your AI is just vibes. Pure, unhinged vibes." },
+    { title: "The AI is confused", message: "It's just sitting there. Waiting. Wondering. Existentially." },
   ],
   posts: [
     { title: "Zero posts. Fascinating.", message: "Your content strategy of 'post nothing ever' is certainly... unique." },

@@ -377,10 +377,22 @@ export function GameQueue() {
 
   const renderCurrentItem = () => {
     if (isLoading) {
+      const loadingMessages = [
+        { emoji: "🦭", text: "Summoning content from the walrus dimension..." },
+        { emoji: "🐹", text: "Hamsters are running faster..." },
+        { emoji: "🌌", text: "Downloading vibes from the cosmos..." },
+        { emoji: "🎲", text: "Rolling for initiative on your queue..." },
+        { emoji: "🔮", text: "Crystal ball buffering..." },
+        { emoji: "🧙", text: "A wizard is organizing your content..." },
+        { emoji: "🍕", text: "Content is being prepared fresh..." },
+        { emoji: "🚀", text: "Launching content rockets..." },
+      ];
+      const randomMessage = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
+
       return (
         <div className="flex flex-col items-center justify-center min-h-[400px]">
-          <div className="text-5xl animate-bounce">🦭</div>
-          <p className="mt-4 text-gray-500">Loading queue...</p>
+          <div className="text-5xl animate-bounce">{randomMessage.emoji}</div>
+          <p className="mt-4 text-gray-500 text-center max-w-xs">{randomMessage.text}</p>
         </div>
       );
     }

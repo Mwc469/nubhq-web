@@ -3,7 +3,7 @@
  * Swipe-based approval queue that feels like a game
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/components/mobile/MobileComponents';
 import {
@@ -433,23 +433,101 @@ export function QueueStats({ remaining, completed, skipped }: QueueStatsProps) {
 }
 
 // ============================================================
-// EMPTY QUEUE STATE
+// EMPTY QUEUE STATE - NOW WITH MAXIMUM SILLINESS
 // ============================================================
 
+// Silly empty state messages - because finishing should be celebrated absurdly
+const SILLY_EMPTY_STATES = [
+  { title: "Queue Clear!", subtitle: "The walrus is weeping tears of joy", emoji: "🦭✨" },
+  { title: "You Did It!", subtitle: "Achievement Unlocked: Professional Emptier of Queues", emoji: "🏆" },
+  { title: "Inbox Zero Energy!", subtitle: "The void stares back... approvingly", emoji: "🕳️👀" },
+  { title: "All Caught Up!", subtitle: "Time to stare at the wall professionally", emoji: "🧱" },
+  { title: "Nothing Left!", subtitle: "You ate all the content. Burp.", emoji: "😋" },
+  { title: "Queue Annihilated!", subtitle: "The content never stood a chance", emoji: "💥" },
+  { title: "Productivity God!", subtitle: "The hamsters powering your brain need a break", emoji: "🐹" },
+  { title: "Empty Like My...", subtitle: "Actually let's not go there", emoji: "😅" },
+  { title: "Queue? What Queue?", subtitle: "Never heard of her", emoji: "🙅" },
+  { title: "You're Free!", subtitle: "Quick! Before more content arrives!", emoji: "🏃" },
+  { title: "Mission Complete!", subtitle: "Snake? SNAKE? SNAAAAAAKE!", emoji: "🐍" },
+  { title: "Finished!", subtitle: "The simulation thanks you for your service", emoji: "🤖" },
+  { title: "Victory Achieved!", subtitle: "Your thumb can finally rest", emoji: "👍💤" },
+  { title: "Level Complete!", subtitle: "But the princess is in another castle", emoji: "🏰" },
+  { title: "Congratulations!", subtitle: "You've reached the end of content (for now)", emoji: "📜" },
+];
+
+// Silly button labels that rotate
+const SILLY_REFRESH_LABELS = [
+  "Check for More",
+  "Feed Me Content",
+  "I Need More",
+  "Again! Again!",
+  "Summon More Tasks",
+  "Poke the Server",
+  "Refresh (Please Work)",
+  "More Chaos Please",
+  "Hit Me",
+  "Keep Em Coming",
+];
+
+function getRandomEmptyState() {
+  return SILLY_EMPTY_STATES[Math.floor(Math.random() * SILLY_EMPTY_STATES.length)];
+}
+
+function getRandomRefreshLabel() {
+  return SILLY_REFRESH_LABELS[Math.floor(Math.random() * SILLY_REFRESH_LABELS.length)];
+}
+
 export function EmptyQueue({ onRefresh }: { onRefresh: () => void }) {
+  const [emptyState, setEmptyState] = useState(getRandomEmptyState);
+  const [refreshLabel, setRefreshLabel] = useState(getRandomRefreshLabel);
+  const [tapCount, setTapCount] = useState(0);
+
+  // Easter egg: tapping the emoji 5 times shows a secret message
+  const handleEmojiTap = () => {
+    const newCount = tapCount + 1;
+    setTapCount(newCount);
+
+    if (newCount >= 5) {
+      setEmptyState({
+        title: "You Found the Secret!",
+        subtitle: "There's no prize, just this. Worth it? Probably not.",
+        emoji: "🎁"
+      });
+      setTapCount(0);
+    } else {
+      // Each tap changes the message
+      setEmptyState(getRandomEmptyState());
+    }
+    haptic?.('light');
+  };
+
+  // New random refresh label each time
+  const handleRefresh = () => {
+    setRefreshLabel(getRandomRefreshLabel());
+    onRefresh();
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-[400px] p-8 text-center">
-      <div className="text-6xl mb-4 animate-bounce">🦭</div>
-      <h2 className="text-2xl font-bold mb-2">Queue Clear! 🎉</h2>
+      <div
+        className="text-6xl mb-4 animate-bounce cursor-pointer"
+        onClick={handleEmojiTap}
+      >
+        {emptyState.emoji}
+      </div>
+      <h2 className="text-2xl font-bold mb-2">{emptyState.title}</h2>
       <p className="text-gray-500 mb-6 max-w-[280px]">
-        You've reviewed everything! The walrus is proud. Come back later for more.
+        {emptyState.subtitle}
       </p>
       <button
-        onClick={onRefresh}
+        onClick={handleRefresh}
         className="px-6 py-3 bg-neon-pink text-white font-bold rounded-xl border-2 border-black shadow-[4px_4px_0_#000] active:translate-y-1 active:shadow-none transition-all"
       >
-        Check for More
+        {refreshLabel}
       </button>
+      <p className="text-xs text-gray-400 mt-4">
+        (tap the {emptyState.emoji.split('')[0]} for more vibes)
+      </p>
     </div>
   );
 }

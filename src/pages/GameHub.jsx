@@ -1,10 +1,11 @@
 /**
  * GameHub - The game-like command center
  * 4 core approval/training tasks presented as fun games
+ * NOW WITH EXTRA SILLINESS
  */
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Calendar,
   Mail,
@@ -13,6 +14,9 @@ import {
   Zap,
   Flame,
   Sparkles,
+  Trophy,
+  Star,
+  PartyPopper,
 } from 'lucide-react';
 
 import { CosmicGlow } from '../components/ui/CosmicBackground';
@@ -21,6 +25,34 @@ import { LEVELS, XP_REWARDS } from '../lib/gamification';
 import { playSound } from '../lib/soundSystem';
 import { haptic } from '../components/mobile/MobileComponents';
 import { cn } from '../lib/utils';
+
+// SILLY ACHIEVEMENTS - for doing absolutely nothing
+const SILLY_ACHIEVEMENTS = [
+  { title: "You Showed Up!", desc: "Achievement: Opening the app. Incredible.", icon: "🏆" },
+  { title: "Professional Scroller", desc: "You scrolled! The algorithm trembles.", icon: "📜" },
+  { title: "Breathing Champion", desc: "You've been breathing this whole time!", icon: "🌬️" },
+  { title: "Screen Starer", desc: "5 seconds of dedicated screen staring.", icon: "👁️" },
+  { title: "Gravity Defier", desc: "Your phone hasn't fallen yet. Hero.", icon: "🦸" },
+  { title: "Blink Master", desc: "You blinked! Moisture retained!", icon: "😑" },
+  { title: "Time Traveler", desc: "You just traveled 1 second into the future.", icon: "⏰" },
+  { title: "Wi-Fi Warrior", desc: "Still connected. The router respects you.", icon: "📶" },
+  { title: "Battery Saver", desc: "You haven't drained the battery... yet.", icon: "🔋" },
+  { title: "Thumb Athlete", desc: "Your thumb moved. Olympic potential.", icon: "👍" },
+];
+
+// Random motivational messages that pop up
+const RANDOM_ENCOURAGEMENT = [
+  "You're doing amazing sweetie! ✨",
+  "The walrus believes in you (even though he's just a PNG)",
+  "Today's vibe check: PASSED",
+  "Plot twist: you're the main character",
+  "Your energy right now? *chef's kiss*",
+  "Fun fact: you're literally crushing it",
+  "Breaking news: local human is incredible",
+  "Your serotonin is showing",
+  "Quick reminder: you're that person",
+  "The universe just winked at you",
+];
 
 // Get stored player stats (or defaults)
 function getPlayerStats() {
@@ -88,6 +120,57 @@ const GAME_MODES = [
   },
 ];
 
+// Silly achievement popup component
+function SillyAchievement({ achievement, onDismiss }) {
+  useEffect(() => {
+    playSound('achievement');
+    haptic?.('success');
+    const timer = setTimeout(onDismiss, 3500);
+    return () => clearTimeout(timer);
+  }, [onDismiss]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -50, scale: 0.8 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -30, scale: 0.9 }}
+      className="fixed top-20 left-1/2 -translate-x-1/2 z-50"
+    >
+      <div className="bg-gradient-to-r from-yellow-400 to-orange-500 px-6 py-4 rounded-2xl border-3 border-black shadow-brutal-lg">
+        <div className="flex items-center gap-3">
+          <span className="text-3xl">{achievement.icon}</span>
+          <div>
+            <p className="text-black font-black text-sm">ACHIEVEMENT UNLOCKED!</p>
+            <p className="text-black font-bold">{achievement.title}</p>
+            <p className="text-black/70 text-xs">{achievement.desc}</p>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// Random encouragement toast
+function EncouragementToast({ message, onDismiss }) {
+  useEffect(() => {
+    const timer = setTimeout(onDismiss, 3000);
+    return () => clearTimeout(timer);
+  }, [onDismiss]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 50 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 50 }}
+      className="fixed bottom-24 right-4 z-50 max-w-xs"
+    >
+      <div className="bg-white dark:bg-gray-800 px-4 py-3 rounded-xl border-2 border-neon-pink shadow-lg">
+        <p className="text-sm font-medium text-gray-800 dark:text-white">{message}</p>
+      </div>
+    </motion.div>
+  );
+}
+
 // Game tile component
 function GameTile({ game, pending, onClick, delay }) {
   const Icon = game.icon;
@@ -148,6 +231,9 @@ function GameTile({ game, pending, onClick, delay }) {
 
 export default function GameHub() {
   const navigate = useNavigate();
+  const [sillyAchievement, setSillyAchievement] = useState(null);
+  const [encouragement, setEncouragement] = useState(null);
+  const [confettiActive, setConfettiActive] = useState(false);
 
   const playerStats = useMemo(() => getPlayerStats(), []);
   const levelInfo = useMemo(() => getLevelInfo(playerStats.xp), [playerStats.xp]);
@@ -169,6 +255,46 @@ export default function GameHub() {
     return Math.min((currentLevelXp / levelRange) * 100, 100);
   }, [playerStats.xp, levelInfo]);
 
+  // Random silly achievement on page load (10% chance)
+  useEffect(() => {
+    const hasSeenToday = sessionStorage.getItem('silly_achievement_shown');
+    if (!hasSeenToday && Math.random() < 0.4) {
+      const randomAchievement = SILLY_ACHIEVEMENTS[Math.floor(Math.random() * SILLY_ACHIEVEMENTS.length)];
+      setTimeout(() => {
+        setSillyAchievement(randomAchievement);
+        sessionStorage.setItem('silly_achievement_shown', 'true');
+      }, 2000);
+    }
+  }, []);
+
+  // Random encouragement every 30-60 seconds
+  useEffect(() => {
+    const showEncouragement = () => {
+      if (Math.random() < 0.3) { // 30% chance when timer fires
+        const randomMsg = RANDOM_ENCOURAGEMENT[Math.floor(Math.random() * RANDOM_ENCOURAGEMENT.length)];
+        setEncouragement(randomMsg);
+      }
+    };
+
+    const interval = setInterval(showEncouragement, 30000 + Math.random() * 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Random confetti burst (very rare)
+  useEffect(() => {
+    const confettiBurst = () => {
+      if (Math.random() < 0.05) { // 5% chance
+        setConfettiActive(true);
+        playSound('combo');
+        haptic?.('success');
+        setTimeout(() => setConfettiActive(false), 2000);
+      }
+    };
+
+    const interval = setInterval(confettiBurst, 45000);
+    return () => clearInterval(interval);
+  }, []);
+
   const handleGameSelect = (game) => {
     haptic?.('medium');
     playSound('tap');
@@ -188,6 +314,59 @@ export default function GameHub() {
   return (
     <div className="relative min-h-full pb-24">
       <CosmicGlow />
+
+      {/* Silly achievement popup */}
+      <AnimatePresence>
+        {sillyAchievement && (
+          <SillyAchievement
+            achievement={sillyAchievement}
+            onDismiss={() => setSillyAchievement(null)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Random encouragement toast */}
+      <AnimatePresence>
+        {encouragement && (
+          <EncouragementToast
+            message={encouragement}
+            onDismiss={() => setEncouragement(null)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Random confetti burst */}
+      <AnimatePresence>
+        {confettiActive && (
+          <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+            {[...Array(30)].map((_, i) => (
+              <motion.div
+                key={i}
+                initial={{
+                  opacity: 1,
+                  x: Math.random() * window.innerWidth,
+                  y: -20,
+                  rotate: 0,
+                }}
+                animate={{
+                  opacity: 0,
+                  y: window.innerHeight + 50,
+                  rotate: 360 * (Math.random() > 0.5 ? 1 : -1),
+                  x: Math.random() * window.innerWidth,
+                }}
+                transition={{
+                  duration: 2 + Math.random(),
+                  ease: 'linear',
+                }}
+                className="absolute w-3 h-3 rounded-sm"
+                style={{
+                  background: ['#E91E8C', '#9B30FF', '#00D4D4', '#E6C700', '#FF6B35'][i % 5],
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </AnimatePresence>
 
       <div className="relative z-10 px-4 py-6 max-w-lg mx-auto">
         {/* XP Bar */}
