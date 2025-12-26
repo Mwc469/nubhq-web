@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { Bell, X, CheckCircle, Mail, Calendar, AlertCircle } from 'lucide-react';
+import { Bell, CheckCircle, Mail, Calendar, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { cn } from '../lib/utils';
 import { useTheme } from '../contexts/ThemeContext';
 
 const typeIcons = {
@@ -11,13 +12,20 @@ const typeIcons = {
 };
 
 const typeColors = {
-  approval: 'text-yellow-400',
-  fan_mail: 'text-blue-400',
-  calendar: 'text-green-400',
+  approval: 'text-neon-yellow',
+  fan_mail: 'text-neon-cyan',
+  calendar: 'text-neon-purple',
   alert: 'text-red-400',
 };
 
-// Mock notifications for now
+const typeBgColors = {
+  approval: 'bg-neon-yellow/20',
+  fan_mail: 'bg-neon-cyan/20',
+  calendar: 'bg-neon-purple/20',
+  alert: 'bg-red-400/20',
+};
+
+// Mock notifications
 const mockNotifications = [
   { id: 1, type: 'approval', title: 'New approval request', message: 'Message to @user123 needs review', time: '2m ago', read: false, url: '/approvals' },
   { id: 2, type: 'fan_mail', title: 'New fan message', message: 'Sarah sent you a message', time: '15m ago', read: false, url: '/fan-mail' },
@@ -62,28 +70,42 @@ export default function Notifications() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`relative p-2 border-3 border-black transition-colors ${
+        className={cn(
+          'relative flex items-center justify-center w-10 h-10 rounded-xl border-3 transition-all',
+          'hover:translate-x-[-2px] hover:translate-y-[-2px]',
           isLight
-            ? 'bg-gray-100 hover:bg-gray-200 text-gray-600'
-            : 'bg-white/5 hover:bg-white/10 text-white/60'
-        }`}
+            ? 'bg-gray-100 border-gray-300 text-gray-600 shadow-[4px_4px_0_#d1d5db] hover:shadow-[6px_6px_0_#d1d5db]'
+            : 'bg-white/5 border-white/20 text-white/60 shadow-[4px_4px_0_rgba(255,255,255,0.1)] hover:shadow-[6px_6px_0_rgba(255,255,255,0.1)]'
+        )}
       >
-        <Bell size={20} />
+        <Bell size={18} />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold flex items-center justify-center border-2 border-black">
+          <span className="absolute -top-1 -right-1 w-5 h-5 bg-neon-pink text-white text-[10px] font-black flex items-center justify-center rounded-lg border-2 border-black">
             {unreadCount}
           </span>
         )}
       </button>
 
       {isOpen && (
-        <div className={`absolute right-0 top-full mt-2 w-80 border-3 border-black shadow-brutal z-50 ${isLight ? 'bg-white' : 'bg-brand-dark'}`}>
-          <div className={`flex items-center justify-between p-3 border-b-3 border-black`}>
-            <h3 className={`font-bold ${isLight ? 'text-gray-900' : 'text-white'}`}>Notifications</h3>
+        <div
+          className={cn(
+            'absolute right-0 top-full mt-2 w-80 rounded-2xl border-3 overflow-hidden z-50',
+            isLight
+              ? 'bg-white border-neon-cyan shadow-[8px_8px_0_var(--neon-cyan)]'
+              : 'bg-gray-900 border-neon-cyan shadow-[8px_8px_0_var(--neon-cyan)]'
+          )}
+        >
+          <div className={cn(
+            'flex items-center justify-between p-4 border-b-3',
+            isLight ? 'border-gray-200' : 'border-white/10'
+          )}>
+            <h3 className={cn('font-black', isLight ? 'text-gray-900' : 'text-white')}>
+              Notifications
+            </h3>
             {unreadCount > 0 && (
               <button
                 onClick={markAllAsRead}
-                className="text-xs text-brand-orange hover:underline"
+                className="text-xs font-bold text-neon-pink hover:underline"
               >
                 Mark all read
               </button>
@@ -92,8 +114,10 @@ export default function Notifications() {
 
           <div className="max-h-80 overflow-auto">
             {notifications.length === 0 ? (
-              <div className={`p-8 text-center ${isLight ? 'text-gray-500' : 'text-white/50'}`}>
-                No notifications
+              <div className={cn('p-8 text-center', isLight ? 'text-gray-500' : 'text-white/50')}>
+                <Bell size={32} className="mx-auto mb-2 opacity-40" />
+                <p className="font-bold">No notifications</p>
+                <p className="text-xs opacity-60">You're all caught up!</p>
               </div>
             ) : (
               notifications.map((notification) => {
@@ -102,32 +126,31 @@ export default function Notifications() {
                   <button
                     key={notification.id}
                     onClick={() => handleNotificationClick(notification)}
-                    className={`w-full flex items-start gap-3 p-3 text-left transition-colors ${
-                      !notification.read
-                        ? isLight
-                          ? 'bg-orange-50'
-                          : 'bg-brand-orange/10'
-                        : ''
-                    } ${
-                      isLight
-                        ? 'hover:bg-gray-100 border-b border-gray-100'
-                        : 'hover:bg-white/5 border-b border-white/10'
-                    }`}
+                    className={cn(
+                      'w-full flex items-start gap-3 p-4 text-left transition-colors',
+                      !notification.read && (isLight ? 'bg-neon-pink/5' : 'bg-neon-pink/10'),
+                      isLight ? 'hover:bg-gray-50 border-b border-gray-100' : 'hover:bg-white/5 border-b border-white/5'
+                    )}
                   >
-                    <Icon size={18} className={typeColors[notification.type]} />
+                    <div className={cn(
+                      'w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0',
+                      typeBgColors[notification.type]
+                    )}>
+                      <Icon size={18} className={typeColors[notification.type]} />
+                    </div>
                     <div className="flex-1 min-w-0">
-                      <p className={`font-medium text-sm ${isLight ? 'text-gray-900' : 'text-white'}`}>
+                      <p className={cn('font-bold text-sm', isLight ? 'text-gray-900' : 'text-white')}>
                         {notification.title}
                       </p>
-                      <p className={`text-xs truncate ${isLight ? 'text-gray-500' : 'text-white/50'}`}>
+                      <p className={cn('text-xs truncate', isLight ? 'text-gray-500' : 'text-white/50')}>
                         {notification.message}
                       </p>
-                      <p className={`text-xs mt-1 ${isLight ? 'text-gray-400' : 'text-white/30'}`}>
+                      <p className={cn('text-[10px] mt-1 uppercase tracking-wider', isLight ? 'text-gray-400' : 'text-white/30')}>
                         {notification.time}
                       </p>
                     </div>
                     {!notification.read && (
-                      <div className="w-2 h-2 bg-brand-orange rounded-full mt-1" />
+                      <div className="w-2 h-2 bg-neon-pink rounded-full mt-2 flex-shrink-0" />
                     )}
                   </button>
                 );

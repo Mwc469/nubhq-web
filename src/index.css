@@ -1,15 +1,34 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 @theme {
   --color-brand-orange: #a76d24;
   --color-brand-dark: #262729;
   --color-brand-light: #f5f5f5;
+  --color-neon-pink: #E91E8C;
+  --color-neon-cyan: #00D4D4;
+  --color-neon-yellow: #E6C700;
+  --color-neon-green: #32CD32;
+  --color-neon-purple: #9B30FF;
+  --color-neon-orange: #E65C00;
   --shadow-brutal: 4px 4px 0px 0px #000000;
   --shadow-brutal-sm: 2px 2px 0px 0px #000000;
   --shadow-brutal-orange: 4px 4px 0px 0px #a76d24;
+  --shadow-brutal-pink: 4px 4px 0px 0px #E91E8C;
+  --shadow-brutal-cyan: 4px 4px 0px 0px #00D4D4;
+  --shadow-brutal-yellow: 4px 4px 0px 0px #E6C700;
+  --shadow-brutal-green: 4px 4px 0px 0px #32CD32;
+  --shadow-brutal-purple: 4px 4px 0px 0px #9B30FF;
 }
 
 :root {
+  --neon-pink: #E91E8C;
+  --neon-cyan: #00D4D4;
+  --neon-yellow: #E6C700;
+  --neon-green: #32CD32;
+  --neon-purple: #9B30FF;
+  --neon-orange: #E65C00;
+
   --bg-primary: #262729;
   --bg-secondary: #1a1a1b;
   --bg-card: #333336;
@@ -19,7 +38,7 @@
   --border-color: #000000;
 }
 
-[data-theme="light"] {
+[data-theme="light"], .light {
   --bg-primary: #f5f5f5;
   --bg-secondary: #ffffff;
   --bg-card: #ffffff;
@@ -37,13 +56,46 @@ body {
   margin: 0;
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
   min-height: 100vh;
   transition: background-color 0.2s, color 0.2s;
 }
 
 #root {
   min-height: 100vh;
+}
+
+/* Neo-brutal utility classes */
+.neo-brutal {
+  border: 3px solid currentColor;
+  box-shadow: 4px 4px 0 currentColor;
+  transition: all 0.15s ease;
+}
+
+.neo-brutal:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 currentColor;
+}
+
+.neo-brutal:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 currentColor;
+}
+
+.neon-border {
+  border: 3px solid var(--neon-pink);
+  box-shadow: 0 0 10px var(--neon-pink), inset 0 0 5px rgba(233, 30, 140, 0.1);
+}
+
+.neon-text {
+  text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink);
+}
+
+.gradient-glow {
+  background: linear-gradient(135deg, var(--neon-pink) 0%, var(--neon-purple) 50%, var(--neon-cyan) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 @keyframes slide-in {
@@ -59,4 +111,17 @@ body {
 
 .animate-slide-in {
   animation: slide-in 0.2s ease-out;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px var(--neon-pink);
+  }
+  50% {
+    box-shadow: 0 0 20px var(--neon-pink), 0 0 30px var(--neon-pink);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
 }

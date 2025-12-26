@@ -1,8 +1,12 @@
 import { useState } from 'react';
-import { Check, X, Clock, MessageSquare, Loader2, CheckSquare, Square } from 'lucide-react';
+import { Check, X, Clock, MessageSquare, Loader2, CheckSquare, Square, Sparkles } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
+import { cn } from '../lib/utils';
+import NeoBrutalCard from '../components/ui/NeoBrutalCard';
+import NeoBrutalButton from '../components/ui/NeoBrutalButton';
+import PageHeader from '../components/ui/PageHeader';
+import EmptyState from '../components/ui/EmptyState';
+import { Skeleton, SkeletonList } from '../components/ui/Skeleton';
 import { useApprovals, useApprove, useReject } from '../hooks/useApi';
 import { useToast } from '../contexts/ToastContext';
 import { useTheme } from '../contexts/ThemeContext';
@@ -12,57 +16,67 @@ const ApprovalCard = ({ item, onApprove, onReject, isApproving, isRejecting, isS
   const isLight = theme === 'light';
 
   return (
-    <Card className="space-y-4">
+    <NeoBrutalCard accentColor="yellow" className="space-y-4">
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
           <button
             onClick={() => onToggleSelect(item.id)}
-            className={`p-1 transition-colors ${isLight ? 'text-gray-400 hover:text-gray-600' : 'text-white/40 hover:text-white'}`}
+            className={cn(
+              'p-1 transition-colors rounded-lg',
+              isLight ? 'text-gray-400 hover:text-gray-600 hover:bg-gray-100' : 'text-white/40 hover:text-white hover:bg-white/10'
+            )}
           >
             {isSelected ? (
-              <CheckSquare size={20} className="text-brand-orange" />
+              <CheckSquare size={20} className="text-neon-pink" />
             ) : (
               <Square size={20} />
             )}
           </button>
           <div className="flex items-center gap-2">
-            <MessageSquare size={18} className="text-brand-orange" />
-            <span className={`text-sm font-medium ${isLight ? 'text-gray-600' : 'text-white/60'}`}>
+            <div className="w-8 h-8 rounded-xl bg-neon-cyan/20 flex items-center justify-center">
+              <MessageSquare size={16} className="text-neon-cyan" />
+            </div>
+            <span className={cn('text-sm font-bold', isLight ? 'text-gray-600' : 'text-white/60')}>
               Message to {item.recipient}
             </span>
           </div>
         </div>
-        <div className={`flex items-center gap-1 text-xs ${isLight ? 'text-gray-400' : 'text-white/40'}`}>
-          <Clock size={14} />
+        <div className={cn(
+          'flex items-center gap-1 text-xs px-2 py-1 rounded-lg',
+          isLight ? 'text-gray-400 bg-gray-100' : 'text-white/40 bg-white/5'
+        )}>
+          <Clock size={12} />
           <span>{formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}</span>
         </div>
       </div>
 
-      <p className={`text-lg leading-relaxed ${isLight ? 'text-gray-900' : 'text-white'}`}>{item.content}</p>
+      <p className={cn('text-lg leading-relaxed', isLight ? 'text-gray-900' : 'text-white')}>
+        {item.content}
+      </p>
 
       <div className="flex gap-3 pt-2">
-        <Button
-          variant="primary"
+        <NeoBrutalButton
+          accentColor="green"
           size="sm"
           onClick={() => onApprove(item.id)}
           disabled={isApproving || isRejecting}
-          className="flex items-center gap-2"
         >
           {isApproving ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
           Approve
-        </Button>
-        <Button
-          variant="ghost"
+        </NeoBrutalButton>
+        <NeoBrutalButton
+          variant="outline"
+          accentColor="pink"
           size="sm"
           onClick={() => onReject(item.id)}
           disabled={isApproving || isRejecting}
-          className="flex items-center gap-2 text-red-400 hover:text-red-300"
+          className="text-red-400 border-red-400 hover:bg-red-400/10"
         >
           {isRejecting ? <Loader2 size={16} className="animate-spin" /> : <X size={16} />}
           Reject
-        </Button>
+        </NeoBrutalButton>
       </div>
-    </Card>
+    </NeoBrutalCard>
   );
 };
 
@@ -153,67 +167,77 @@ const ApprovalQueue = () => {
 
   if (error) {
     return (
-      <Card className="text-center py-12">
-        <p className="text-red-400">Error loading approvals</p>
-      </Card>
+      <NeoBrutalCard accentColor="pink" className="text-center py-12">
+        <p className="text-red-400 font-bold">Error loading approvals</p>
+      </NeoBrutalCard>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className={`text-3xl font-bold ${isLight ? 'text-gray-900' : 'text-white'}`}>Approval Queue</h1>
-          <p className={`mt-1 ${isLight ? 'text-gray-600' : 'text-white/60'}`}>
-            {isLoading ? 'Loading...' : `${approvals?.length ?? 0} items pending review`}
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        tagline="Quality Control"
+        title="Approval Queue"
+        subtitle={isLoading ? 'Loading...' : `${approvals?.length ?? 0} items pending review`}
+      />
 
       {/* Bulk Actions Bar */}
       {selectedIds.size > 0 && (
-        <div className={`flex items-center justify-between p-4 border-3 border-black shadow-brutal ${isLight ? 'bg-white' : 'bg-brand-orange/20'}`}>
-          <span className={`font-medium ${isLight ? 'text-gray-900' : 'text-white'}`}>
+        <NeoBrutalCard accentColor="pink" className="flex items-center justify-between">
+          <span className={cn('font-bold', isLight ? 'text-gray-900' : 'text-white')}>
             {selectedIds.size} selected
           </span>
           <div className="flex gap-3">
-            <Button variant="primary" size="sm" onClick={handleBulkApprove}>
-              <Check size={16} className="mr-2" />
+            <NeoBrutalButton accentColor="green" size="sm" onClick={handleBulkApprove}>
+              <Check size={16} />
               Approve All
-            </Button>
-            <Button variant="danger" size="sm" onClick={handleBulkReject}>
-              <X size={16} className="mr-2" />
+            </NeoBrutalButton>
+            <NeoBrutalButton
+              variant="outline"
+              size="sm"
+              onClick={handleBulkReject}
+              className="text-red-400 border-red-400"
+            >
+              <X size={16} />
               Reject All
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())}>
+            </NeoBrutalButton>
+            <NeoBrutalButton variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())}>
               Cancel
-            </Button>
+            </NeoBrutalButton>
           </div>
-        </div>
+        </NeoBrutalCard>
       )}
 
       {isLoading ? (
-        <Card className="text-center py-12">
-          <Loader2 size={48} className="mx-auto text-brand-orange mb-4 animate-spin" />
-          <p className={isLight ? 'text-gray-600' : 'text-white/60'}>Loading approvals...</p>
-        </Card>
+        <NeoBrutalCard accentColor="yellow">
+          <div className="text-center py-8">
+            <Loader2 size={48} className="mx-auto text-neon-yellow mb-4 animate-spin" />
+            <p className={cn('font-bold', isLight ? 'text-gray-500' : 'text-white/60')}>
+              Loading approvals...
+            </p>
+          </div>
+        </NeoBrutalCard>
       ) : approvals?.length === 0 ? (
-        <Card className="text-center py-12">
-          <Check size={48} className="mx-auto text-green-400 mb-4" />
-          <h2 className={`text-xl font-bold ${isLight ? 'text-gray-900' : 'text-white'}`}>All caught up!</h2>
-          <p className={`mt-2 ${isLight ? 'text-gray-600' : 'text-white/60'}`}>No pending approvals at the moment.</p>
-        </Card>
+        <NeoBrutalCard accentColor="green">
+          <EmptyState
+            icon={Check}
+            title="All caught up!"
+            description="No pending approvals at the moment. Time for a coffee break."
+            accentColor="green"
+          />
+        </NeoBrutalCard>
       ) : (
         <>
           <div className="flex items-center gap-2">
             <button
               onClick={selectAll}
-              className={`flex items-center gap-2 px-3 py-1.5 text-sm transition-colors ${
-                isLight ? 'text-gray-600 hover:text-gray-900' : 'text-white/60 hover:text-white'
-              }`}
+              className={cn(
+                'flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-colors',
+                isLight ? 'text-gray-600 hover:bg-gray-100' : 'text-white/60 hover:bg-white/10'
+              )}
             >
               {selectedIds.size === approvals?.length ? (
-                <CheckSquare size={18} className="text-brand-orange" />
+                <CheckSquare size={18} className="text-neon-pink" />
               ) : (
                 <Square size={18} />
               )}

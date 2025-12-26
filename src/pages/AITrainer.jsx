@@ -1,7 +1,10 @@
 import { useState } from 'react';
-import { Bot, Plus, MessageSquare, ArrowRight, X, Loader2, Sparkles, Tag } from 'lucide-react';
-import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
+import { Bot, Plus, MessageSquare, ArrowRight, X, Loader2, Sparkles, Tag, Brain, Zap } from 'lucide-react';
+import { cn } from '../lib/utils';
+import NeoBrutalCard from '../components/ui/NeoBrutalCard';
+import NeoBrutalButton from '../components/ui/NeoBrutalButton';
+import PageHeader from '../components/ui/PageHeader';
+import EmptyState from '../components/ui/EmptyState';
 import {
   useTrainingStats,
   useTrainingExamples,
@@ -9,51 +12,77 @@ import {
   useDeleteTrainingExample,
 } from '../hooks/useApi';
 import { useToast } from '../contexts/ToastContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 const CATEGORIES = [
-  { value: 'greeting', label: 'Greetings', color: 'bg-blue-500' },
-  { value: 'thanks', label: 'Thank You', color: 'bg-green-500' },
-  { value: 'question', label: 'Questions', color: 'bg-purple-500' },
-  { value: 'promo', label: 'Promos', color: 'bg-yellow-500' },
-  { value: 'compliment', label: 'Compliments', color: 'bg-pink-500' },
-  { value: 'general', label: 'General', color: 'bg-gray-500' },
+  { value: 'greeting', label: 'Greetings', color: 'cyan' },
+  { value: 'thanks', label: 'Thank You', color: 'green' },
+  { value: 'question', label: 'Questions', color: 'purple' },
+  { value: 'promo', label: 'Promos', color: 'yellow' },
+  { value: 'compliment', label: 'Compliments', color: 'pink' },
+  { value: 'general', label: 'General', color: 'orange' },
 ];
+
+const colorClasses = {
+  pink: { bg: 'bg-neon-pink', text: 'text-neon-pink', bgLight: 'bg-neon-pink/20' },
+  cyan: { bg: 'bg-neon-cyan', text: 'text-neon-cyan', bgLight: 'bg-neon-cyan/20' },
+  yellow: { bg: 'bg-neon-yellow', text: 'text-neon-yellow', bgLight: 'bg-neon-yellow/20' },
+  green: { bg: 'bg-neon-green', text: 'text-neon-green', bgLight: 'bg-neon-green/20' },
+  purple: { bg: 'bg-neon-purple', text: 'text-neon-purple', bgLight: 'bg-neon-purple/20' },
+  orange: { bg: 'bg-neon-orange', text: 'text-neon-orange', bgLight: 'bg-neon-orange/20' },
+};
 
 const CategoryBadge = ({ category }) => {
   const cat = CATEGORIES.find((c) => c.value === category) || CATEGORIES[5];
+  const colors = colorClasses[cat.color];
   return (
-    <span className={`text-xs px-2 py-0.5 ${cat.color} text-white rounded`}>
+    <span className={cn('text-xs px-3 py-1 font-bold rounded-lg', colors.bg, 'text-black')}>
       {cat.label}
     </span>
   );
 };
 
-const ExampleCard = ({ example, onDelete, isDeleting }) => (
-  <Card className="space-y-3">
-    <div className="flex items-start justify-between">
-      <CategoryBadge category={example.category} />
-      <button
-        onClick={() => onDelete(example.id)}
-        disabled={isDeleting}
-        className="p-1 hover:bg-red-500/20 rounded text-red-400"
-      >
-        <X size={16} />
-      </button>
-    </div>
-    <div className="space-y-2">
-      <div className="flex items-start gap-2">
-        <MessageSquare size={16} className="text-white/40 mt-1 flex-shrink-0" />
-        <p className="text-white/70 text-sm">{example.input_message}</p>
-      </div>
-      <div className="flex items-start gap-2">
-        <ArrowRight size={16} className="text-brand-orange mt-1 flex-shrink-0" />
-        <p className="text-white text-sm">{example.response}</p>
-      </div>
-    </div>
-  </Card>
-);
+const ExampleCard = ({ example, onDelete, isDeleting, isLight }) => {
+  const cat = CATEGORIES.find((c) => c.value === example.category) || CATEGORIES[5];
 
-const NewExampleModal = ({ onClose, onCreate, isCreating }) => {
+  return (
+    <NeoBrutalCard accentColor={cat.color} className="space-y-3">
+      <div className="flex items-start justify-between">
+        <CategoryBadge category={example.category} />
+        <button
+          onClick={() => onDelete(example.id)}
+          disabled={isDeleting}
+          className={cn(
+            'p-2 rounded-xl transition-colors',
+            isLight ? 'hover:bg-red-100 text-red-400' : 'hover:bg-red-500/20 text-red-400'
+          )}
+        >
+          <X size={16} />
+        </button>
+      </div>
+      <div className="space-y-3">
+        <div className="flex items-start gap-3">
+          <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
+            <MessageSquare size={14} className={isLight ? 'text-gray-400' : 'text-white/40'} />
+          </div>
+          <p className={cn('text-sm', isLight ? 'text-gray-600' : 'text-white/70')}>
+            {example.input_message}
+          </p>
+        </div>
+        <div className="flex items-start gap-3">
+          <div className="w-8 h-8 rounded-xl bg-neon-pink/20 flex items-center justify-center flex-shrink-0">
+            <ArrowRight size={14} className="text-neon-pink" />
+          </div>
+          <p className={cn('text-sm font-medium', isLight ? 'text-gray-900' : 'text-white')}>
+            {example.response}
+          </p>
+        </div>
+      </div>
+    </NeoBrutalCard>
+  );
+};
+
+const NewExampleModal = ({ onClose, onCreate, isCreating, isLight }) => {
   const [category, setCategory] = useState('general');
   const [inputMessage, setInputMessage] = useState('');
   const [response, setResponse] = useState('');
@@ -69,71 +98,113 @@ const NewExampleModal = ({ onClose, onCreate, isCreating }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-lg">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-white">Add Training Example</h3>
-          <button onClick={onClose} className="p-1 hover:bg-white/10 rounded">
-            <X size={20} className="text-white/60" />
+      <NeoBrutalCard accentColor="pink" className="w-full max-w-lg">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-neon-pink/20 flex items-center justify-center">
+              <Brain size={20} className="text-neon-pink" />
+            </div>
+            <h3 className={cn('text-lg font-black', isLight ? 'text-gray-900' : 'text-white')}>
+              Add Training Example
+            </h3>
+          </div>
+          <button
+            onClick={onClose}
+            className={cn(
+              'p-2 rounded-xl transition-colors',
+              isLight ? 'hover:bg-gray-100 text-gray-500' : 'hover:bg-white/10 text-white/60'
+            )}
+          >
+            <X size={20} />
           </button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm text-white/60 mb-2">Category</label>
+            <label className={cn('block text-sm font-bold mb-2', isLight ? 'text-gray-600' : 'text-white/60')}>
+              Category
+            </label>
             <div className="flex flex-wrap gap-2">
-              {CATEGORIES.map((cat) => (
-                <button
-                  key={cat.value}
-                  type="button"
-                  onClick={() => setCategory(cat.value)}
-                  className={`px-3 py-1.5 text-sm border-2 transition-colors ${
-                    category === cat.value
-                      ? 'border-brand-orange bg-brand-orange/20 text-white'
-                      : 'border-white/20 text-white/60 hover:border-white/40'
-                  }`}
-                >
-                  {cat.label}
-                </button>
-              ))}
+              {CATEGORIES.map((cat) => {
+                const colors = colorClasses[cat.color];
+                return (
+                  <button
+                    key={cat.value}
+                    type="button"
+                    onClick={() => setCategory(cat.value)}
+                    className={cn(
+                      'px-4 py-2 text-sm font-bold rounded-xl border-2 transition-all',
+                      category === cat.value
+                        ? cn(colors.bg, 'text-black border-transparent')
+                        : isLight
+                        ? 'border-gray-200 text-gray-600 hover:border-gray-300'
+                        : 'border-white/20 text-white/60 hover:border-white/40'
+                    )}
+                  >
+                    {cat.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
           <div>
-            <label className="block text-sm text-white/60 mb-1">Fan Message</label>
+            <label className={cn('block text-sm font-bold mb-2', isLight ? 'text-gray-600' : 'text-white/60')}>
+              Fan Message
+            </label>
             <textarea
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               required
               rows={2}
-              className="w-full bg-white/5 border-3 border-black p-2 text-white resize-none focus:outline-none focus:ring-2 focus:ring-brand-orange"
+              className={cn(
+                'w-full p-3 rounded-xl border-3 resize-none focus:outline-none focus:ring-2 focus:ring-neon-pink',
+                isLight
+                  ? 'bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400'
+                  : 'bg-white/5 border-white/20 text-white placeholder:text-white/40'
+              )}
               placeholder="What the fan might say..."
             />
           </div>
           <div>
-            <label className="block text-sm text-white/60 mb-1">Your Response</label>
+            <label className={cn('block text-sm font-bold mb-2', isLight ? 'text-gray-600' : 'text-white/60')}>
+              Your Response
+            </label>
             <textarea
               value={response}
               onChange={(e) => setResponse(e.target.value)}
               required
               rows={3}
-              className="w-full bg-white/5 border-3 border-black p-2 text-white resize-none focus:outline-none focus:ring-2 focus:ring-brand-orange"
+              className={cn(
+                'w-full p-3 rounded-xl border-3 resize-none focus:outline-none focus:ring-2 focus:ring-neon-pink',
+                isLight
+                  ? 'bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400'
+                  : 'bg-white/5 border-white/20 text-white placeholder:text-white/40'
+              )}
               placeholder="How you would respond..."
             />
           </div>
           <div className="flex gap-3 pt-2">
-            <Button type="submit" variant="primary" disabled={isCreating || !inputMessage || !response}>
-              {isCreating ? <Loader2 size={16} className="animate-spin" /> : 'Add Example'}
-            </Button>
-            <Button type="button" variant="ghost" onClick={onClose}>
+            <NeoBrutalButton
+              type="submit"
+              accentColor="pink"
+              disabled={isCreating || !inputMessage || !response}
+            >
+              {isCreating ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
+              Add Example
+            </NeoBrutalButton>
+            <NeoBrutalButton type="button" variant="ghost" onClick={onClose}>
               Cancel
-            </Button>
+            </NeoBrutalButton>
           </div>
         </form>
-      </Card>
+      </NeoBrutalCard>
     </div>
   );
 };
 
 const AITrainer = () => {
   const toast = useToast();
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
   const [showNewExample, setShowNewExample] = useState(false);
   const [filterCategory, setFilterCategory] = useState(null);
 
@@ -161,98 +232,127 @@ const AITrainer = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-white">AI Trainer</h1>
-          <p className="text-white/60 mt-1">Teach your AI to respond like you</p>
-        </div>
-        <Button
-          variant="primary"
-          onClick={() => setShowNewExample(true)}
-          className="flex items-center gap-2"
-        >
-          <Plus size={18} />
-          <span className="hidden sm:inline">Add Example</span>
-        </Button>
-      </div>
+      <PageHeader
+        tagline="Voice Cloning"
+        title="AI Trainer"
+        subtitle="Teach your AI to respond like you"
+        actions={
+          <NeoBrutalButton accentColor="pink" onClick={() => setShowNewExample(true)}>
+            <Plus size={18} />
+            <span className="hidden sm:inline">Add Example</span>
+          </NeoBrutalButton>
+        }
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="text-center">
-          <Bot size={24} className="mx-auto text-brand-orange mb-2" />
-          <p className="text-2xl font-bold text-white">
-            {statsLoading ? '...' : stats?.total_examples ?? 0}
-          </p>
-          <p className="text-sm text-white/60">Total Examples</p>
-        </Card>
-        {CATEGORIES.slice(0, 3).map((cat) => (
-          <Card key={cat.value} className="text-center">
-            <div className={`w-6 h-6 ${cat.color} rounded mx-auto mb-2`} />
-            <p className="text-2xl font-bold text-white">
-              {statsLoading ? '...' : stats?.by_category?.[cat.value] ?? 0}
+        <NeoBrutalCard accentColor="pink" hover={false}>
+          <div className="text-center">
+            <div className="w-12 h-12 rounded-xl bg-neon-pink/20 flex items-center justify-center mx-auto mb-3">
+              <Bot size={24} className="text-neon-pink" />
+            </div>
+            <p className={cn('text-3xl font-black', isLight ? 'text-gray-900' : 'text-white')}>
+              {statsLoading ? '...' : stats?.total_examples ?? 0}
             </p>
-            <p className="text-sm text-white/60">{cat.label}</p>
-          </Card>
-        ))}
+            <p className={cn('text-xs font-bold uppercase tracking-wider', isLight ? 'text-gray-500' : 'text-white/50')}>
+              Total Examples
+            </p>
+          </div>
+        </NeoBrutalCard>
+        {CATEGORIES.slice(0, 3).map((cat) => {
+          const colors = colorClasses[cat.color];
+          return (
+            <NeoBrutalCard key={cat.value} accentColor={cat.color} hover={false}>
+              <div className="text-center">
+                <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3', colors.bgLight)}>
+                  <Zap size={24} className={colors.text} />
+                </div>
+                <p className={cn('text-3xl font-black', isLight ? 'text-gray-900' : 'text-white')}>
+                  {statsLoading ? '...' : stats?.by_category?.[cat.value] ?? 0}
+                </p>
+                <p className={cn('text-xs font-bold uppercase tracking-wider', isLight ? 'text-gray-500' : 'text-white/50')}>
+                  {cat.label}
+                </p>
+              </div>
+            </NeoBrutalCard>
+          );
+        })}
       </div>
 
       {/* Info Card */}
-      <Card className="bg-brand-orange/10 border-brand-orange/30">
+      <NeoBrutalCard accentColor="yellow">
         <div className="flex items-start gap-4">
-          <Sparkles size={24} className="text-brand-orange flex-shrink-0" />
+          <div className="w-12 h-12 rounded-xl bg-neon-yellow/20 flex items-center justify-center flex-shrink-0">
+            <Sparkles size={24} className="text-neon-yellow" />
+          </div>
           <div>
-            <h3 className="font-bold text-white mb-1">How it works</h3>
-            <p className="text-sm text-white/70">
+            <h3 className={cn('font-black mb-1', isLight ? 'text-gray-900' : 'text-white')}>
+              How it works
+            </h3>
+            <p className={cn('text-sm', isLight ? 'text-gray-600' : 'text-white/70')}>
               Add examples of fan messages and how you'd respond. The more examples you add,
               the better your AI will learn your unique voice and personality. Aim for at least
               20-30 examples across different categories.
             </p>
           </div>
         </div>
-      </Card>
+      </NeoBrutalCard>
 
       {/* Filter */}
       <div className="flex items-center gap-2 flex-wrap">
-        <Tag size={16} className="text-white/60" />
+        <Tag size={16} className={isLight ? 'text-gray-400' : 'text-white/40'} />
         <button
           onClick={() => setFilterCategory(null)}
-          className={`px-3 py-1 text-sm rounded transition-colors ${
+          className={cn(
+            'px-4 py-2 text-sm font-bold rounded-xl transition-colors',
             filterCategory === null
-              ? 'bg-brand-orange text-white'
-              : 'bg-white/10 text-white/60 hover:text-white'
-          }`}
+              ? 'bg-neon-pink text-white'
+              : isLight
+              ? 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              : 'bg-white/10 text-white/60 hover:bg-white/20'
+          )}
         >
           All
         </button>
-        {CATEGORIES.map((cat) => (
-          <button
-            key={cat.value}
-            onClick={() => setFilterCategory(cat.value)}
-            className={`px-3 py-1 text-sm rounded transition-colors ${
-              filterCategory === cat.value
-                ? 'bg-brand-orange text-white'
-                : 'bg-white/10 text-white/60 hover:text-white'
-            }`}
-          >
-            {cat.label}
-          </button>
-        ))}
+        {CATEGORIES.map((cat) => {
+          const colors = colorClasses[cat.color];
+          return (
+            <button
+              key={cat.value}
+              onClick={() => setFilterCategory(cat.value)}
+              className={cn(
+                'px-4 py-2 text-sm font-bold rounded-xl transition-colors',
+                filterCategory === cat.value
+                  ? cn(colors.bg, 'text-black')
+                  : isLight
+                  ? 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-white/10 text-white/60 hover:bg-white/20'
+              )}
+            >
+              {cat.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Examples List */}
       {examplesLoading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 size={32} className="text-brand-orange animate-spin" />
+          <Loader2 size={32} className="text-neon-pink animate-spin" />
         </div>
       ) : examples?.length === 0 ? (
-        <Card className="text-center py-12">
-          <Bot size={48} className="mx-auto text-brand-orange mb-4" />
-          <h2 className="text-xl font-bold text-white mb-2">No examples yet</h2>
-          <p className="text-white/60 mb-4">Start training your AI by adding some examples</p>
-          <Button variant="primary" onClick={() => setShowNewExample(true)}>
-            Add Your First Example
-          </Button>
-        </Card>
+        <NeoBrutalCard accentColor="purple">
+          <EmptyState
+            icon={Bot}
+            title="No examples yet"
+            description="Start training your AI by adding some examples of how you respond to fans"
+            action={{
+              label: 'Add Your First Example',
+              onClick: () => setShowNewExample(true),
+            }}
+            accentColor="purple"
+          />
+        </NeoBrutalCard>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {examples?.map((example) => (
@@ -261,6 +361,7 @@ const AITrainer = () => {
               example={example}
               onDelete={handleDelete}
               isDeleting={deleteMutation.isPending && deleteMutation.variables === example.id}
+              isLight={isLight}
             />
           ))}
         </div>
@@ -272,6 +373,7 @@ const AITrainer = () => {
           onClose={() => setShowNewExample(false)}
           onCreate={handleCreate}
           isCreating={createMutation.isPending}
+          isLight={isLight}
         />
       )}
     </div>
