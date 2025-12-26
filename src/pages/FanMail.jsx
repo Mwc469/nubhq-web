@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { Mail, Inbox, X, Circle, Loader2, ArrowLeft } from 'lucide-react';
+import { Mail, Inbox, X, Circle, Loader2, ArrowLeft, Send, Check } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { useFanMail, useMarkAsRead } from '../hooks/useApi';
+import { useFanMail, useMarkAsRead, useReplyToMessage } from '../hooks/useApi';
+import { useToast } from '../contexts/ToastContext';
 
 const MessageRow = ({ message, isSelected, onClick }) => (
   <button
@@ -13,7 +14,9 @@ const MessageRow = ({ message, isSelected, onClick }) => (
     }`}
   >
     <div className="pt-1">
-      {!message.is_read ? (
+      {message.reply ? (
+        <Check size={10} className="text-green-400" />
+      ) : !message.is_read ? (
         <Circle size={10} className="fill-brand-orange text-brand-orange" />
       ) : (
         <Circle size={10} className="text-white/20" />
@@ -35,64 +38,107 @@ const MessageRow = ({ message, isSelected, onClick }) => (
   </button>
 );
 
-const MessageDetail = ({ message, onClose, onMarkAsRead, isMarking }) => (
-  <div className="flex flex-col h-full">
-    <div className="flex items-center justify-between p-4 border-b border-white/10">
-      <button
-        onClick={onClose}
-        className="md:hidden p-2 hover:bg-white/10 rounded transition-colors"
-      >
-        <ArrowLeft size={20} className="text-white" />
-      </button>
-      <div className="flex-1 md:flex-none">
-        <h3 className="font-bold text-white">{message.sender_name}</h3>
-        <p className="text-xs text-white/50">@{message.sender_id}</p>
-      </div>
-      <div className="flex items-center gap-2">
-        {!message.is_read && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onMarkAsRead(message.id)}
-            disabled={isMarking}
-            className="text-xs"
-          >
-            {isMarking ? <Loader2 size={14} className="animate-spin" /> : 'Mark as read'}
-          </Button>
-        )}
+const MessageDetail = ({ message, onClose, onMarkAsRead, isMarking, onSendReply, isSendingReply }) => {
+  const [replyText, setReplyText] = useState('');
+
+  const handleSendReply = () => {
+    if (replyText.trim()) {
+      onSendReply(message.id, replyText.trim());
+      setReplyText('');
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="flex items-center justify-between p-4 border-b border-white/10">
         <button
           onClick={onClose}
-          className="hidden md:block p-2 hover:bg-white/10 rounded transition-colors"
+          className="md:hidden p-2 hover:bg-white/10 rounded transition-colors"
         >
-          <X size={20} className="text-white/60" />
+          <ArrowLeft size={20} className="text-white" />
         </button>
+        <div className="flex-1 md:flex-none">
+          <h3 className="font-bold text-white">{message.sender_name}</h3>
+          <p className="text-xs text-white/50">@{message.sender_id}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          {!message.is_read && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onMarkAsRead(message.id)}
+              disabled={isMarking}
+              className="text-xs"
+            >
+              {isMarking ? <Loader2 size={14} className="animate-spin" /> : 'Mark as read'}
+            </Button>
+          )}
+          <button
+            onClick={onClose}
+            className="hidden md:block p-2 hover:bg-white/10 rounded transition-colors"
+          >
+            <X size={20} className="text-white/60" />
+          </button>
+        </div>
       </div>
-    </div>
-    <div className="flex-1 p-4 overflow-auto">
-      <p className="text-xs text-white/40 mb-4">
-        {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
-      </p>
-      <p className="text-white leading-relaxed whitespace-pre-wrap">{message.content}</p>
-    </div>
-    <div className="p-4 border-t border-white/10">
-      <textarea
-        placeholder="Write a reply..."
-        className="w-full bg-white/5 border-3 border-black p-3 text-white placeholder-white/40 resize-none focus:outline-none focus:ring-2 focus:ring-brand-orange"
-        rows={3}
-      />
-      <div className="flex justify-end mt-3">
-        <Button variant="primary" size="sm">
-          Send Reply
-        </Button>
+      <div className="flex-1 p-4 overflow-auto">
+        <p className="text-xs text-white/40 mb-4">
+          {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
+        </p>
+        <p className="text-white leading-relaxed whitespace-pre-wrap">{message.content}</p>
+
+        {message.reply && (
+          <div className="mt-6 pt-4 border-t border-white/10">
+            <div className="flex items-center gap-2 mb-2">
+              <Check size={14} className="text-green-400" />
+              <span className="text-xs text-green-400 font-medium">Replied</span>
+              <span className="text-xs text-white/40">
+                {message.replied_at && formatDistanceToNow(new Date(message.replied_at), { addSuffix: true })}
+              </span>
+            </div>
+            <div className="bg-brand-orange/10 border-l-4 border-brand-orange p-3">
+              <p className="text-white/90 whitespace-pre-wrap">{message.reply}</p>
+            </div>
+          </div>
+        )}
       </div>
+
+      {!message.reply && (
+        <div className="p-4 border-t border-white/10">
+          <textarea
+            value={replyText}
+            onChange={(e) => setReplyText(e.target.value)}
+            placeholder="Write a reply..."
+            className="w-full bg-white/5 border-3 border-black p-3 text-white placeholder-white/40 resize-none focus:outline-none focus:ring-2 focus:ring-brand-orange"
+            rows={3}
+          />
+          <div className="flex justify-end mt-3">
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={handleSendReply}
+              disabled={!replyText.trim() || isSendingReply}
+            >
+              {isSendingReply ? (
+                <Loader2 size={16} className="animate-spin mr-2" />
+              ) : (
+                <Send size={16} className="mr-2" />
+              )}
+              Send Reply
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
-  </div>
-);
+  );
+};
 
 const FanMail = () => {
   const [selectedId, setSelectedId] = useState(null);
   const { data: messages, isLoading, error } = useFanMail();
   const markAsReadMutation = useMarkAsRead();
+  const replyMutation = useReplyToMessage();
+  const { showToast } = useToast();
 
   const selectedMessage = messages?.find((m) => m.id === selectedId);
   const unreadCount = messages?.filter((m) => !m.is_read).length ?? 0;
@@ -102,6 +148,20 @@ const FanMail = () => {
     if (!message.is_read) {
       markAsReadMutation.mutate(message.id);
     }
+  };
+
+  const handleSendReply = (id, reply) => {
+    replyMutation.mutate(
+      { id, reply },
+      {
+        onSuccess: () => {
+          showToast('Reply sent successfully!', 'success');
+        },
+        onError: () => {
+          showToast('Failed to send reply', 'error');
+        },
+      }
+    );
   };
 
   if (error) {
@@ -179,6 +239,8 @@ const FanMail = () => {
                 onClose={() => setSelectedId(null)}
                 onMarkAsRead={(id) => markAsReadMutation.mutate(id)}
                 isMarking={markAsReadMutation.isPending}
+                onSendReply={handleSendReply}
+                isSendingReply={replyMutation.isPending}
               />
             ) : (
               <div className="text-center text-white/40">

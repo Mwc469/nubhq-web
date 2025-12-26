@@ -6,8 +6,10 @@ import {
   Bot,
   Mail,
   Settings,
+  LogOut,
 } from 'lucide-react';
 import MobileNav from '../components/mobile/MobileNav';
+import { useAuth } from '../contexts/AuthContext';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -19,6 +21,8 @@ const navItems = [
 ];
 
 const Layout = () => {
+  const { user, logout } = useAuth();
+
   return (
     <div className="min-h-screen bg-brand-dark">
       {/* Desktop Sidebar */}
@@ -45,6 +49,18 @@ const Layout = () => {
             </NavLink>
           ))}
         </nav>
+        <div className="p-4 border-t-3 border-black">
+          <div className="text-white/70 text-sm mb-2 truncate">
+            {user?.display_name || user?.email}
+          </div>
+          <button
+            onClick={logout}
+            className="flex items-center gap-2 w-full px-4 py-2 text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+          >
+            <LogOut size={18} />
+            <span>Sign Out</span>
+          </button>
+        </div>
       </aside>
 
       {/* Main Content */}

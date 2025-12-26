@@ -57,6 +57,16 @@ export function useMarkAsRead() {
   });
 }
 
+export function useReplyToMessage() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, reply }) => api.post(`/fan-mail/${id}/reply`, { reply }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['fan-mail'] });
+    },
+  });
+}
+
 // Settings
 export function useSettings() {
   return useQuery({
