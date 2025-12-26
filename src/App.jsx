@@ -19,6 +19,7 @@ const Analytics = lazy(() => import('./pages/Analytics'))
 const ActivityLog = lazy(() => import('./pages/ActivityLog'))
 const Login = lazy(() => import('./pages/Login'))
 const QAChecklist = lazy(() => import('./pages/QAChecklist'))
+const GameQueuePage = lazy(() => import('./pages/GameQueuePage'))
 
 // Loading fallback component
 const PageLoader = () => (
@@ -46,6 +47,7 @@ function App() {
           <Route path="analytics" element={<Analytics />} />
           <Route path="activity" element={<ActivityLog />} />
           <Route path="qa-checklist" element={<QAChecklist />} />
+          <Route path="game-queue" element={<GameQueuePage />} />
           <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
