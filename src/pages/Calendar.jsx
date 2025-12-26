@@ -16,6 +16,7 @@ import { ChevronLeft, ChevronRight, Plus, Clock, X, Loader2 } from 'lucide-react
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { useScheduledPosts, useCreateScheduledPost, useDeleteScheduledPost } from '../hooks/useApi';
+import { useToast } from '../contexts/ToastContext';
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -178,6 +179,7 @@ const DayDetail = ({ date, posts, onClose, onDelete, isDeleting }) => {
 };
 
 const Calendar = () => {
+  const toast = useToast();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [showNewPost, setShowNewPost] = useState(false);
@@ -209,12 +211,17 @@ const Calendar = () => {
     createMutation.mutate(data, {
       onSuccess: () => {
         setShowNewPost(false);
+        toast.success('Post scheduled');
       },
+      onError: () => toast.error('Failed to schedule post'),
     });
   };
 
   const handleDeletePost = (id) => {
-    deleteMutation.mutate(id);
+    deleteMutation.mutate(id, {
+      onSuccess: () => toast.success('Post deleted'),
+      onError: () => toast.error('Failed to delete post'),
+    });
   };
 
   return (

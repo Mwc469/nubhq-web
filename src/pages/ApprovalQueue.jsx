@@ -3,6 +3,7 @@ import { formatDistanceToNow } from 'date-fns';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { useApprovals, useApprove, useReject } from '../hooks/useApi';
+import { useToast } from '../contexts/ToastContext';
 
 const ApprovalCard = ({ item, onApprove, onReject, isApproving, isRejecting }) => (
   <Card className="space-y-4">
@@ -45,16 +46,23 @@ const ApprovalCard = ({ item, onApprove, onReject, isApproving, isRejecting }) =
 );
 
 const ApprovalQueue = () => {
+  const toast = useToast();
   const { data: approvals, isLoading, error } = useApprovals('pending');
   const approveMutation = useApprove();
   const rejectMutation = useReject();
 
   const handleApprove = (id) => {
-    approveMutation.mutate(id);
+    approveMutation.mutate(id, {
+      onSuccess: () => toast.success('Message approved'),
+      onError: () => toast.error('Failed to approve message'),
+    });
   };
 
   const handleReject = (id) => {
-    rejectMutation.mutate(id);
+    rejectMutation.mutate(id, {
+      onSuccess: () => toast.success('Message rejected'),
+      onError: () => toast.error('Failed to reject message'),
+    });
   };
 
   if (error) {

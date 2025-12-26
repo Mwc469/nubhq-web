@@ -2,6 +2,7 @@ import { User, Bell, Shield, Palette, Loader2 } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { useSettings, useUpdateSettings } from '../hooks/useApi';
+import { useToast } from '../contexts/ToastContext';
 
 const SettingSection = ({ icon: Icon, title, description, children }) => (
   <Card className="space-y-4">
@@ -19,11 +20,15 @@ const SettingSection = ({ icon: Icon, title, description, children }) => (
 );
 
 const Settings = () => {
+  const toast = useToast();
   const { data: settings, isLoading } = useSettings();
   const updateMutation = useUpdateSettings();
 
   const handleToggle = (field, currentValue) => {
-    updateMutation.mutate({ [field]: !currentValue });
+    updateMutation.mutate({ [field]: !currentValue }, {
+      onSuccess: () => toast.success('Settings updated'),
+      onError: () => toast.error('Failed to update settings'),
+    });
   };
 
   if (isLoading) {

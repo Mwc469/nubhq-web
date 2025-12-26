@@ -8,6 +8,7 @@ import {
   useCreateTrainingExample,
   useDeleteTrainingExample,
 } from '../hooks/useApi';
+import { useToast } from '../contexts/ToastContext';
 
 const CATEGORIES = [
   { value: 'greeting', label: 'Greetings', color: 'bg-blue-500' },
@@ -132,6 +133,7 @@ const NewExampleModal = ({ onClose, onCreate, isCreating }) => {
 };
 
 const AITrainer = () => {
+  const toast = useToast();
   const [showNewExample, setShowNewExample] = useState(false);
   const [filterCategory, setFilterCategory] = useState(null);
 
@@ -142,12 +144,19 @@ const AITrainer = () => {
 
   const handleCreate = (data) => {
     createMutation.mutate(data, {
-      onSuccess: () => setShowNewExample(false),
+      onSuccess: () => {
+        setShowNewExample(false);
+        toast.success('Training example added');
+      },
+      onError: () => toast.error('Failed to add example'),
     });
   };
 
   const handleDelete = (id) => {
-    deleteMutation.mutate(id);
+    deleteMutation.mutate(id, {
+      onSuccess: () => toast.success('Example deleted'),
+      onError: () => toast.error('Failed to delete example'),
+    });
   };
 
   return (
