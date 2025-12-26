@@ -74,3 +74,46 @@ export function useUpdateSettings() {
     },
   });
 }
+
+// Calendar
+export function useScheduledPosts(start, end) {
+  const params = new URLSearchParams();
+  if (start) params.append('start', start.toISOString());
+  if (end) params.append('end', end.toISOString());
+  const query = params.toString();
+
+  return useQuery({
+    queryKey: ['calendar', start?.toISOString(), end?.toISOString()],
+    queryFn: () => api.get(`/calendar${query ? `?${query}` : ''}`),
+  });
+}
+
+export function useCreateScheduledPost() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data) => api.post('/calendar', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['calendar'] });
+    },
+  });
+}
+
+export function useUpdateScheduledPost() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...data }) => api.patch(`/calendar/${id}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['calendar'] });
+    },
+  });
+}
+
+export function useDeleteScheduledPost() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id) => api.delete(`/calendar/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['calendar'] });
+    },
+  });
+}
