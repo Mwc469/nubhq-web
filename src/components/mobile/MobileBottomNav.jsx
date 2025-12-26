@@ -47,7 +47,7 @@ export default function MobileBottomNav() {
               key={to}
               to={to}
               onClick={handleNavClick}
-              className="flex flex-col items-center justify-center px-3 py-1 relative"
+              className="flex flex-col items-center justify-center px-4 py-2 min-w-[64px] min-h-[48px] relative touch-target"
             >
               {/* Active indicator dot */}
               {isActive && (

@@ -111,7 +111,7 @@ export default function Unlocks() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+      <div className="flex gap-2 mb-6 overflow-x-auto pb-2 -mx-1 px-1">
         {TABS.map(tab => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -123,16 +123,16 @@ export default function Unlocks() {
                 playSound('tap');
               }}
               className={cn(
-                'flex items-center gap-2 px-4 py-2.5 rounded-xl border-3 font-bold transition-all whitespace-nowrap',
+                'flex items-center gap-2 px-4 py-3 min-h-[48px] rounded-xl border-3 font-bold transition-all whitespace-nowrap touch-target',
                 isActive
-                  ? 'bg-neon-pink text-white border-black shadow-[4px_4px_0_#000]'
+                  ? 'bg-neon-pink text-white border-black shadow-brutal'
                   : isLight
-                  ? 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
-                  : 'bg-white/5 text-white/70 border-white/10 hover:border-white/20'
+                  ? 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 active:scale-95'
+                  : 'bg-white/5 text-white/70 border-white/10 hover:border-white/20 active:scale-95'
               )}
             >
-              <Icon size={18} />
-              {tab.label}
+              <Icon size={20} />
+              <span className="hidden sm:inline">{tab.label}</span>
               <span className={cn(
                 'text-xs px-1.5 py-0.5 rounded-full',
                 isActive ? 'bg-white/20' : 'bg-neon-pink/20 text-neon-pink'

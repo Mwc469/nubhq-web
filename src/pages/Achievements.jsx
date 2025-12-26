@@ -133,7 +133,7 @@ export default function Achievements() {
 
       {/* Filter Tabs */}
       <div className="flex items-center justify-between mb-6">
-        <div className="flex gap-2 overflow-x-auto pb-2">
+        <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
           {FILTER_TABS.map(tab => (
             <button
               key={tab.id}
@@ -142,12 +142,12 @@ export default function Achievements() {
                 playSound('tap');
               }}
               className={cn(
-                'px-4 py-2 rounded-xl border-2 font-bold transition-all whitespace-nowrap',
+                'px-4 py-3 min-h-[44px] rounded-xl border-2 font-bold transition-all whitespace-nowrap touch-target-sm',
                 filter === tab.id
-                  ? 'bg-neon-pink text-white border-black shadow-[3px_3px_0_#000]'
+                  ? 'bg-neon-pink text-white border-black shadow-brutal-sm'
                   : isLight
-                  ? 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
-                  : 'bg-white/5 border-white/10 text-white/70 hover:border-white/20'
+                  ? 'bg-white border-gray-200 text-gray-600 hover:border-gray-300 active:scale-95'
+                  : 'bg-white/5 border-white/10 text-white/70 hover:border-white/20 active:scale-95'
               )}
             >
               {tab.label}
@@ -158,16 +158,16 @@ export default function Achievements() {
         <button
           onClick={() => setShowHidden(!showHidden)}
           className={cn(
-            'flex items-center gap-2 px-3 py-2 rounded-lg transition-colors',
+            'flex items-center gap-2 px-4 py-3 min-h-[44px] rounded-xl transition-colors touch-target-sm',
             showHidden
               ? 'bg-neon-purple/20 text-neon-purple'
               : isLight
-              ? 'text-gray-400 hover:text-gray-600'
-              : 'text-white/40 hover:text-white/60'
+              ? 'text-gray-400 hover:text-gray-600 active:scale-95'
+              : 'text-white/40 hover:text-white/60 active:scale-95'
           )}
         >
-          {showHidden ? <Eye size={18} /> : <EyeOff size={18} />}
-          <span className="text-sm font-medium">Hidden</span>
+          {showHidden ? <Eye size={20} /> : <EyeOff size={20} />}
+          <span className="text-sm font-medium hidden sm:inline">Hidden</span>
         </button>
       </div>
 

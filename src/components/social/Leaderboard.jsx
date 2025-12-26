@@ -117,7 +117,7 @@ export default function Leaderboard({ className }) {
   return (
     <div className={className}>
       {/* Tabs */}
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+      <div className="flex gap-2 mb-6 overflow-x-auto pb-2 -mx-1 px-1">
         {TABS.map(tab => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -129,16 +129,16 @@ export default function Leaderboard({ className }) {
                 playSound('tap');
               }}
               className={cn(
-                'flex items-center gap-2 px-4 py-2 rounded-xl border-2 font-bold transition-all whitespace-nowrap',
+                'flex items-center gap-2 px-4 py-3 min-h-[44px] rounded-xl border-2 font-bold transition-all whitespace-nowrap touch-target-sm',
                 isActive
-                  ? `bg-${tab.color} text-white border-black shadow-[3px_3px_0_#000]`
+                  ? `bg-${tab.color} text-white border-black shadow-brutal-sm`
                   : isLight
-                  ? 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
-                  : 'bg-white/5 border-white/10 text-white/70 hover:border-white/20'
+                  ? 'bg-white border-gray-200 text-gray-600 hover:border-gray-300 active:scale-95'
+                  : 'bg-white/5 border-white/10 text-white/70 hover:border-white/20 active:scale-95'
               )}
             >
-              <Icon size={16} />
-              {tab.label}
+              <Icon size={18} />
+              <span className="hidden sm:inline">{tab.label}</span>
             </button>
           );
         })}

@@ -506,3 +506,52 @@ body {
     display: initial !important;
   }
 }
+
+/* ============================================================
+   TOUCH TARGET UTILITIES
+   Ensure all interactive elements meet accessibility standards
+   ============================================================ */
+
+/* Standard touch target (48px - Google Material guideline) */
+.touch-target {
+  min-height: 48px;
+  min-width: 48px;
+}
+
+/* Large touch target (56px - for primary actions) */
+.touch-target-lg {
+  min-height: 56px;
+  min-width: 56px;
+}
+
+/* Apple minimum (44px) */
+.touch-target-sm {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Touch target with proper hit area but smaller visual */
+.touch-target-expand {
+  position: relative;
+}
+
+.touch-target-expand::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 48px;
+  min-height: 48px;
+}
+
+/* Ensure buttons and links have good tap feedback */
+.tap-highlight {
+  -webkit-tap-highlight-color: rgba(233, 30, 140, 0.2);
+  touch-action: manipulation;
+}
+
+.tap-highlight:active {
+  transform: scale(0.96);
+  transition: transform 0.1s ease;
+}
