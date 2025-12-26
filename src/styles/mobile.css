@@ -1,0 +1,508 @@
+/**
+ * NubHQ Mobile-First Design System
+ * Because thumbs need love too 🦦
+ */
+
+:root {
+  /* ============================================================
+     MOBILE-FIRST BREAKPOINTS
+     Start small, scale up. Like an otter learning to swim.
+     ============================================================ */
+  
+  /* Touch target minimums (44px per Apple, 48px per Google) */
+  --nub-touch-target: 48px;
+  --nub-touch-target-min: 44px;
+  
+  /* Spacing that respects thumbs */
+  --nub-mobile-padding: 16px;
+  --nub-mobile-gap: 12px;
+  
+  /* Safe areas for notches and home indicators */
+  --nub-safe-top: env(safe-area-inset-top, 0px);
+  --nub-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --nub-safe-left: env(safe-area-inset-left, 0px);
+  --nub-safe-right: env(safe-area-inset-right, 0px);
+  
+  /* Bottom nav height */
+  --nub-bottom-nav: 64px;
+  
+  /* Header height */
+  --nub-header-height: 56px;
+  
+  /* FAB position */
+  --nub-fab-bottom: calc(var(--nub-bottom-nav) + 16px + var(--nub-safe-bottom));
+}
+
+/* ============================================================
+   RESPONSIVE TYPOGRAPHY
+   Readable on every screen, even your grandma's phone
+   ============================================================ */
+
+html {
+  /* Base: 16px, scales with viewport */
+  font-size: clamp(14px, 3.5vw, 18px);
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  /* Smooth scrolling but not on reduced motion */
+  scroll-behavior: smooth;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   TOUCH-FRIENDLY COMPONENTS
+   Fat fingers welcome here
+   ============================================================ */
+
+/* Buttons that don't require surgical precision */
+.nub-btn {
+  min-height: var(--nub-touch-target);
+  min-width: var(--nub-touch-target);
+  padding: 12px 24px;
+  border-radius: var(--nub-radius-lg);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.nub-btn:active {
+  transform: scale(0.96);
+}
+
+/* Primary button - the star of the show */
+.nub-btn-primary {
+  background: var(--nub-primary);
+  color: white;
+  border: 3px solid var(--nub-secondary);
+  box-shadow: var(--nub-shadow-brutal);
+}
+
+.nub-btn-primary:active {
+  box-shadow: 2px 2px 0 var(--nub-secondary);
+  transform: translate(2px, 2px);
+}
+
+/* Ghost button - spooky but clickable */
+.nub-btn-ghost {
+  background: transparent;
+  color: var(--nub-text);
+  border: 2px solid var(--nub-border);
+}
+
+/* Icon-only button */
+.nub-btn-icon {
+  width: var(--nub-touch-target);
+  height: var(--nub-touch-target);
+  padding: 0;
+  border-radius: var(--nub-radius-full);
+}
+
+/* ============================================================
+   MOBILE NAVIGATION
+   Bottom nav because reaching the top is for giraffes
+   ============================================================ */
+
+.nub-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--nub-bottom-nav) + var(--nub-safe-bottom));
+  padding-bottom: var(--nub-safe-bottom);
+  background: var(--nub-surface);
+  border-top: 3px solid var(--nub-border);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: var(--nub-z-fixed);
+}
+
+.nub-bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 12px;
+  min-width: 64px;
+  min-height: var(--nub-touch-target);
+  color: var(--nub-text-muted);
+  text-decoration: none;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.nub-bottom-nav-item.active {
+  color: var(--nub-primary);
+}
+
+.nub-bottom-nav-item svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Hide bottom nav on desktop */
+@media (min-width: 768px) {
+  .nub-bottom-nav {
+    display: none;
+  }
+}
+
+/* ============================================================
+   FLOATING ACTION BUTTON
+   The big orange friend
+   ============================================================ */
+
+.nub-fab {
+  position: fixed;
+  bottom: var(--nub-fab-bottom);
+  right: calc(16px + var(--nub-safe-right));
+  width: 56px;
+  height: 56px;
+  border-radius: var(--nub-radius-full);
+  background: var(--nub-primary);
+  color: white;
+  border: 3px solid var(--nub-secondary);
+  box-shadow: var(--nub-shadow-brutal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--nub-z-fixed);
+  cursor: pointer;
+  transition: transform 0.2s var(--nub-transition-bounce);
+}
+
+.nub-fab:active {
+  transform: scale(0.9);
+}
+
+.nub-fab svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* ============================================================
+   MOBILE CARDS
+   Swipeable, tappable, delightful
+   ============================================================ */
+
+.nub-card-mobile {
+  background: var(--nub-surface);
+  border: 3px solid var(--nub-border);
+  border-radius: var(--nub-radius-xl);
+  padding: var(--nub-mobile-padding);
+  margin: var(--nub-mobile-gap);
+  box-shadow: var(--nub-shadow-brutal);
+  touch-action: pan-y;
+}
+
+.nub-card-mobile:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+/* Swipeable card */
+.nub-swipe-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.nub-swipe-actions {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+.nub-swipe-actions-left {
+  left: 0;
+  padding-left: 16px;
+  background: linear-gradient(90deg, var(--nub-success) 0%, transparent 100%);
+}
+
+.nub-swipe-actions-right {
+  right: 0;
+  padding-right: 16px;
+  background: linear-gradient(-90deg, var(--nub-error) 0%, transparent 100%);
+}
+
+/* ============================================================
+   PULL TO REFRESH
+   Like petting an otter
+   ============================================================ */
+
+.nub-pull-indicator {
+  position: fixed;
+  top: var(--nub-safe-top);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 16px;
+  background: var(--nub-surface);
+  border: 2px solid var(--nub-border);
+  border-radius: var(--nub-radius-full);
+  font-size: 0.875rem;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: var(--nub-z-toast);
+}
+
+.nub-pull-indicator.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(8px);
+}
+
+/* ============================================================
+   MOBILE INPUTS
+   Type with your thumbs, not your hopes and dreams
+   ============================================================ */
+
+.nub-input-mobile {
+  width: 100%;
+  min-height: var(--nub-touch-target);
+  padding: 12px 16px;
+  font-size: 16px; /* Prevents iOS zoom */
+  background: var(--nub-surface);
+  border: 3px solid var(--nub-border);
+  border-radius: var(--nub-radius-lg);
+  color: var(--nub-text);
+  transition: border-color 0.2s ease;
+}
+
+.nub-input-mobile:focus {
+  outline: none;
+  border-color: var(--nub-primary);
+}
+
+.nub-input-mobile::placeholder {
+  color: var(--nub-text-muted);
+}
+
+/* Textarea that grows */
+.nub-textarea-mobile {
+  min-height: 120px;
+  resize: none;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   MOBILE SHEETS
+   Slide up from the bottom like a sneaky otter
+   ============================================================ */
+
+.nub-sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: var(--nub-z-modal-backdrop);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.nub-sheet-overlay.open {
+  opacity: 1;
+}
+
+.nub-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-height: 90vh;
+  background: var(--nub-surface);
+  border-radius: var(--nub-radius-2xl) var(--nub-radius-2xl) 0 0;
+  border: 3px solid var(--nub-border);
+  border-bottom: none;
+  padding: var(--nub-mobile-padding);
+  padding-bottom: calc(var(--nub-mobile-padding) + var(--nub-safe-bottom));
+  z-index: var(--nub-z-modal);
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.nub-sheet.open {
+  transform: translateY(0);
+}
+
+.nub-sheet-handle {
+  width: 36px;
+  height: 5px;
+  background: var(--nub-border-strong);
+  border-radius: var(--nub-radius-full);
+  margin: 0 auto 16px;
+}
+
+/* ============================================================
+   GESTURE HINTS
+   Visual cues for touch interactions
+   ============================================================ */
+
+.nub-gesture-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--nub-surface-overlay);
+  border-radius: var(--nub-radius-full);
+  font-size: 0.75rem;
+  color: var(--nub-text-muted);
+}
+
+/* Swipe indicator dots */
+.nub-swipe-dots {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  padding: 12px;
+}
+
+.nub-swipe-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--nub-radius-full);
+  background: var(--nub-border);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.nub-swipe-dot.active {
+  background: var(--nub-primary);
+  transform: scale(1.2);
+}
+
+/* ============================================================
+   MOBILE-FIRST LAYOUT UTILITIES
+   ============================================================ */
+
+/* Full-bleed container */
+.nub-full-bleed {
+  width: 100vw;
+  margin-left: calc(-1 * var(--nub-mobile-padding));
+  margin-right: calc(-1 * var(--nub-mobile-padding));
+  padding-left: var(--nub-mobile-padding);
+  padding-right: var(--nub-mobile-padding);
+}
+
+/* Safe area padding */
+.nub-safe-area {
+  padding-left: var(--nub-safe-left);
+  padding-right: var(--nub-safe-right);
+}
+
+.nub-safe-area-top {
+  padding-top: var(--nub-safe-top);
+}
+
+.nub-safe-area-bottom {
+  padding-bottom: var(--nub-safe-bottom);
+}
+
+/* Content with bottom nav clearance */
+.nub-content-with-nav {
+  padding-bottom: calc(var(--nub-bottom-nav) + var(--nub-safe-bottom) + 16px);
+}
+
+/* Sticky header */
+.nub-sticky-header {
+  position: sticky;
+  top: 0;
+  background: var(--nub-surface);
+  border-bottom: 3px solid var(--nub-border);
+  z-index: var(--nub-z-sticky);
+  padding: 12px var(--nub-mobile-padding);
+  padding-top: calc(12px + var(--nub-safe-top));
+}
+
+/* ============================================================
+   HAPTIC FEEDBACK CLASSES
+   For JavaScript to trigger vibrations
+   ============================================================ */
+
+[data-haptic="light"] { /* 10ms vibration */ }
+[data-haptic="medium"] { /* 20ms vibration */ }
+[data-haptic="heavy"] { /* 30ms vibration */ }
+[data-haptic="success"] { /* pattern: 10, 50, 10 */ }
+[data-haptic="error"] { /* pattern: 50, 100, 50 */ }
+
+/* ============================================================
+   RESPONSIVE BREAKPOINT UTILITIES
+   Mobile-first: styles apply from breakpoint UP
+   ============================================================ */
+
+/* Hide on mobile, show on tablet+ */
+.nub-hide-mobile {
+  display: none !important;
+}
+
+@media (min-width: 768px) {
+  .nub-hide-mobile {
+    display: initial !important;
+  }
+  
+  .nub-hide-tablet {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .nub-hide-tablet {
+    display: initial !important;
+  }
+  
+  .nub-hide-desktop {
+    display: none !important;
+  }
+}
+
+/* Show only on specific breakpoints */
+.nub-mobile-only {
+  display: initial;
+}
+
+@media (min-width: 768px) {
+  .nub-mobile-only {
+    display: none !important;
+  }
+}
+
+.nub-tablet-only {
+  display: none;
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .nub-tablet-only {
+    display: initial !important;
+  }
+}
+
+.nub-desktop-only {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .nub-desktop-only {
+    display: initial !important;
+  }
+}

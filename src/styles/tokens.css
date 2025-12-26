@@ -1,0 +1,246 @@
+/**
+ * NubHQ Design Tokens
+ * Centralized color and styling variables
+ * 
+ * Import in your main CSS:
+ * @import './tokens.css';
+ * 
+ * Usage in components:
+ * className="text-[var(--nub-primary)]"
+ * className="bg-[var(--nub-surface)]"
+ */
+
+:root {
+  /* ============================================================
+     BRAND COLORS
+     ============================================================ */
+  
+  /* Primary Orange Palette */
+  --nub-primary: #f19b38;
+  --nub-primary-hover: #d98830;
+  --nub-primary-active: #c17628;
+  --nub-primary-light: #fde4c8;
+  --nub-primary-dark: #a76d24;
+  
+  /* Secondary Colors */
+  --nub-secondary: #2c3e50;
+  --nub-secondary-hover: #34495e;
+  --nub-secondary-light: #5d6d7e;
+  
+  /* Accent Colors */
+  --nub-accent-rust: #b44a1c;
+  --nub-accent-coral: #e74c3c;
+  --nub-accent-teal: #1abc9c;
+  --nub-accent-purple: #9b59b6;
+  --nub-accent-pink: #fd79a8;
+  
+  /* ============================================================
+     SEMANTIC COLORS
+     ============================================================ */
+  
+  /* Status */
+  --nub-success: #27ae60;
+  --nub-success-light: #d4edda;
+  --nub-warning: #f39c12;
+  --nub-warning-light: #fff3cd;
+  --nub-error: #e74c3c;
+  --nub-error-light: #f8d7da;
+  --nub-info: #3498db;
+  --nub-info-light: #d1ecf1;
+  
+  /* Content State */
+  --nub-draft: #95a5a6;
+  --nub-pending: #f39c12;
+  --nub-approved: #27ae60;
+  --nub-scheduled: #3498db;
+  --nub-posted: #9b59b6;
+  --nub-rejected: #e74c3c;
+  
+  /* ============================================================
+     SURFACE COLORS (Light Mode)
+     ============================================================ */
+  
+  --nub-bg: #f5f5f5;
+  --nub-surface: #ffffff;
+  --nub-surface-raised: #ffffff;
+  --nub-surface-overlay: rgba(255, 255, 255, 0.95);
+  
+  --nub-border: #e0e0e0;
+  --nub-border-strong: #bdbdbd;
+  --nub-border-focus: var(--nub-primary);
+  
+  --nub-text: #1a1a1a;
+  --nub-text-secondary: #666666;
+  --nub-text-muted: #999999;
+  --nub-text-inverse: #ffffff;
+  
+  /* ============================================================
+     SHADOWS
+     ============================================================ */
+  
+  --nub-shadow-sm: 2px 2px 0 rgba(0, 0, 0, 0.1);
+  --nub-shadow-md: 4px 4px 0 rgba(0, 0, 0, 0.15);
+  --nub-shadow-lg: 6px 6px 0 rgba(0, 0, 0, 0.2);
+  --nub-shadow-brutal: 4px 4px 0 var(--nub-secondary);
+  --nub-shadow-brutal-primary: 4px 4px 0 var(--nub-primary-dark);
+  
+  /* ============================================================
+     SPACING
+     ============================================================ */
+  
+  --nub-space-xs: 0.25rem;
+  --nub-space-sm: 0.5rem;
+  --nub-space-md: 1rem;
+  --nub-space-lg: 1.5rem;
+  --nub-space-xl: 2rem;
+  --nub-space-2xl: 3rem;
+  
+  /* ============================================================
+     TYPOGRAPHY
+     ============================================================ */
+  
+  --nub-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --nub-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --nub-font-display: 'Space Grotesk', var(--nub-font-sans);
+  
+  --nub-text-xs: 0.75rem;
+  --nub-text-sm: 0.875rem;
+  --nub-text-base: 1rem;
+  --nub-text-lg: 1.125rem;
+  --nub-text-xl: 1.25rem;
+  --nub-text-2xl: 1.5rem;
+  --nub-text-3xl: 2rem;
+  --nub-text-4xl: 2.5rem;
+  
+  /* ============================================================
+     BORDERS & RADIUS
+     ============================================================ */
+  
+  --nub-radius-sm: 0.375rem;
+  --nub-radius-md: 0.5rem;
+  --nub-radius-lg: 0.75rem;
+  --nub-radius-xl: 1rem;
+  --nub-radius-2xl: 1.5rem;
+  --nub-radius-full: 9999px;
+  
+  --nub-border-width: 2px;
+  --nub-border-width-thick: 3px;
+  
+  /* ============================================================
+     TRANSITIONS
+     ============================================================ */
+  
+  --nub-transition-fast: 100ms ease;
+  --nub-transition-normal: 200ms ease;
+  --nub-transition-slow: 300ms ease;
+  --nub-transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  
+  /* ============================================================
+     Z-INDEX SCALE
+     ============================================================ */
+  
+  --nub-z-dropdown: 1000;
+  --nub-z-sticky: 1020;
+  --nub-z-fixed: 1030;
+  --nub-z-modal-backdrop: 1040;
+  --nub-z-modal: 1050;
+  --nub-z-popover: 1060;
+  --nub-z-tooltip: 1070;
+  --nub-z-toast: 1080;
+}
+
+/* ============================================================
+   DARK MODE OVERRIDES
+   ============================================================ */
+
+.dark {
+  --nub-bg: #1a1a1a;
+  --nub-surface: #262729;
+  --nub-surface-raised: #2d2f31;
+  --nub-surface-overlay: rgba(38, 39, 41, 0.95);
+  
+  --nub-border: #3d3f41;
+  --nub-border-strong: #4d4f51;
+  
+  --nub-text: #f5f5f5;
+  --nub-text-secondary: #a0a0a0;
+  --nub-text-muted: #707070;
+  --nub-text-inverse: #1a1a1a;
+  
+  --nub-shadow-sm: 2px 2px 0 rgba(0, 0, 0, 0.3);
+  --nub-shadow-md: 4px 4px 0 rgba(0, 0, 0, 0.4);
+  --nub-shadow-lg: 6px 6px 0 rgba(0, 0, 0, 0.5);
+  --nub-shadow-brutal: 4px 4px 0 #000000;
+}
+
+/* ============================================================
+   UTILITY CLASSES
+   ============================================================ */
+
+.nub-border {
+  border-width: var(--nub-border-width-thick);
+  border-style: solid;
+}
+
+.nub-shadow-brutal {
+  box-shadow: var(--nub-shadow-brutal);
+}
+
+.nub-shadow-brutal-primary {
+  box-shadow: var(--nub-shadow-brutal-primary);
+}
+
+.nub-card {
+  background: var(--nub-surface);
+  border: var(--nub-border-width-thick) solid var(--nub-border);
+  border-radius: var(--nub-radius-xl);
+  box-shadow: var(--nub-shadow-brutal);
+}
+
+.nub-input {
+  background: var(--nub-surface);
+  border: var(--nub-border-width) solid var(--nub-border);
+  border-radius: var(--nub-radius-md);
+  transition: border-color var(--nub-transition-fast);
+}
+
+.nub-input:focus {
+  border-color: var(--nub-border-focus);
+  outline: none;
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+
+@keyframes nub-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes nub-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10%); }
+}
+
+@keyframes nub-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+@keyframes nub-slide-up {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes nub-slide-down {
+  from { transform: translateY(-10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-nub-pulse { animation: nub-pulse 2s infinite; }
+.animate-nub-bounce { animation: nub-bounce 1s infinite; }
+.animate-nub-shake { animation: nub-shake 0.5s; }
+.animate-nub-slide-up { animation: nub-slide-up 0.3s ease-out; }
+.animate-nub-slide-down { animation: nub-slide-down 0.3s ease-out; }

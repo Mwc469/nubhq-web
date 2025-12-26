@@ -1,0 +1,224 @@
+/* ============================================================
+   NUB BRAND COLORS - OFFICIAL PALETTE
+   ============================================================
+   Use these for the most accurate representation of the NUB brand.
+   
+   Primary Orange:     #a76d24  - Main brand color
+   Shadow Orange:      #c37f2c  - Hover states, shadows
+   Highlight Brown:    #9d6623  - Active states, accents
+   Black Outline:      #000000  - Borders, text
+   Background Gray:    #808080  - Neutral backgrounds
+   Dark Bottom:        #262729  - Dark mode backgrounds
+   Logo Orange:        #f19b38  - Bright accents, CTAs
+   White:              #fefefe  - Light backgrounds, text
+   ============================================================ */
+
+:root {
+  /* === NUB BRAND CORE === */
+  --nub-orange: #a76d24;
+  --nub-orange-light: #c37f2c;
+  --nub-orange-dark: #9d6623;
+  --nub-orange-bright: #f19b38;
+  --nub-black: #000000;
+  --nub-gray: #808080;
+  --nub-dark: #262729;
+  --nub-white: #fefefe;
+  
+  /* === ACCENT COLORS (NUB-compatible) === */
+  /* Warmer, earthier versions that complement the orange */
+  --nub-accent-gold: #d4a017;      /* Warm gold for highlights */
+  --nub-accent-rust: #b44a1c;      /* Rust red for errors/warnings */
+  --nub-accent-sage: #6b8e5d;      /* Muted sage for success */
+  --nub-accent-navy: #2c3e50;      /* Deep navy for info */
+  --nub-accent-plum: #5d3a5d;      /* Muted plum for special */
+  
+  /* === SEMANTIC COLORS === */
+  --nub-primary: var(--nub-orange);
+  --nub-primary-hover: var(--nub-orange-light);
+  --nub-primary-active: var(--nub-orange-dark);
+  --nub-primary-bright: var(--nub-orange-bright);
+  
+  --nub-success: var(--nub-accent-sage);
+  --nub-warning: var(--nub-accent-gold);
+  --nub-error: var(--nub-accent-rust);
+  --nub-info: var(--nub-accent-navy);
+  
+  /* === LEGACY MAPPINGS (for existing components) === */
+  /* These map the old neon colors to NUB brand equivalents */
+  --neon-pink: var(--nub-orange-bright);     /* Primary CTA color */
+  --neon-cyan: var(--nub-accent-navy);       /* Secondary accent */
+  --neon-yellow: var(--nub-accent-gold);     /* Warnings, pending */
+  --neon-green: var(--nub-accent-sage);      /* Success states */
+  --neon-purple: var(--nub-accent-plum);     /* Special/VIP */
+  --neon-orange: var(--nub-orange);          /* Brand primary */
+  
+  /* === LIGHT MODE === */
+  --bg-primary: var(--nub-white);
+  --bg-secondary: #f5f5f5;
+  --bg-tertiary: #e8e8e8;
+  --text-primary: var(--nub-black);
+  --text-secondary: #4a4a4a;
+  --text-muted: var(--nub-gray);
+  --border-color: var(--nub-black);
+  --border-subtle: #d0d0d0;
+}
+
+.dark {
+  /* === DARK MODE === */
+  --bg-primary: var(--nub-dark);
+  --bg-secondary: #1a1a1c;
+  --bg-tertiary: #333336;
+  --text-primary: var(--nub-white);
+  --text-secondary: #b0b0b0;
+  --text-muted: var(--nub-gray);
+  --border-color: var(--nub-orange);
+  --border-subtle: #444448;
+  
+  /* Brighter accents for dark mode visibility */
+  --nub-primary: var(--nub-orange-bright);
+  --nub-primary-hover: #ffad4a;
+  --nub-primary-active: var(--nub-orange);
+}
+
+/* ============================================================
+   NUB UTILITY CLASSES
+   ============================================================ */
+
+/* Brand gradient - warm orange flow */
+.nub-gradient {
+  background: linear-gradient(135deg, var(--nub-orange) 0%, var(--nub-orange-bright) 50%, var(--nub-accent-gold) 100%);
+}
+
+.nub-gradient-text {
+  background: linear-gradient(135deg, var(--nub-orange) 0%, var(--nub-orange-bright) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Neo-brutal with NUB colors */
+.nub-brutal {
+  border: 3px solid var(--nub-black);
+  box-shadow: 4px 4px 0 var(--nub-black);
+  transition: all 0.15s ease;
+}
+
+.nub-brutal:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--nub-black);
+}
+
+.nub-brutal:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--nub-black);
+}
+
+/* NUB-branded border glow (subtle, warm) */
+.nub-glow {
+  box-shadow: 0 0 10px var(--nub-orange), 0 0 20px rgba(167, 109, 36, 0.3);
+}
+
+/* Card styles */
+.nub-card {
+  background: var(--bg-primary);
+  border: 3px solid var(--border-color);
+  border-radius: 1rem;
+  box-shadow: 4px 4px 0 var(--nub-black);
+}
+
+.dark .nub-card {
+  box-shadow: 4px 4px 0 var(--nub-orange);
+}
+
+/* Button primary */
+.nub-btn-primary {
+  background: var(--nub-orange);
+  color: var(--nub-white);
+  border: 3px solid var(--nub-black);
+  box-shadow: 4px 4px 0 var(--nub-black);
+  font-weight: 700;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  transition: all 0.15s ease;
+}
+
+.nub-btn-primary:hover {
+  background: var(--nub-orange-bright);
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--nub-black);
+}
+
+.nub-btn-primary:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--nub-black);
+}
+
+/* Status colors */
+.nub-status-success { color: var(--nub-success); }
+.nub-status-warning { color: var(--nub-warning); }
+.nub-status-error { color: var(--nub-error); }
+.nub-status-info { color: var(--nub-info); }
+
+.nub-bg-success { background-color: var(--nub-success); }
+.nub-bg-warning { background-color: var(--nub-warning); }
+.nub-bg-error { background-color: var(--nub-error); }
+.nub-bg-info { background-color: var(--nub-info); }
+
+/* ============================================================
+   COMPONENT-SPECIFIC OVERRIDES
+   ============================================================ */
+
+/* Sidebar active state */
+.nub-nav-active {
+  background: rgba(167, 109, 36, 0.2);
+  border: 2px solid var(--nub-orange);
+  box-shadow: 3px 3px 0 var(--nub-orange);
+}
+
+/* Badge styles */
+.nub-badge {
+  background: var(--nub-orange);
+  color: var(--nub-white);
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  border: 2px solid var(--nub-black);
+}
+
+.nub-badge-outline {
+  background: transparent;
+  color: var(--nub-orange);
+  border: 2px solid var(--nub-orange);
+}
+
+/* Progress bar */
+.nub-progress {
+  background: var(--bg-tertiary);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.nub-progress-fill {
+  background: linear-gradient(90deg, var(--nub-orange-dark), var(--nub-orange-bright));
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+/* Input focus states */
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--nub-orange) !important;
+  box-shadow: 0 0 0 3px rgba(167, 109, 36, 0.2);
+}
+
+/* Link styles */
+a.nub-link {
+  color: var(--nub-orange);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+a.nub-link:hover {
+  color: var(--nub-orange-bright);
+}

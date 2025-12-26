@@ -1,10 +1,11 @@
 /**
  * NubHQ Animations & Micro-interactions
- * Making every tap, swipe, and scroll feel delightful
+ * Making every tap, swipe, and scroll feel delightful 🦦
  */
 
 /* ============================================================
    SPRING ANIMATIONS
+   Bouncy, playful, alive
    ============================================================ */
 
 @keyframes nub-spring-in {
@@ -51,11 +52,32 @@
   75% { transform: scale(0.95, 1.05); }
 }
 
+.animate-spring-in {
+  animation: nub-spring-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-spring-out {
+  animation: nub-spring-out 0.3s ease-out forwards;
+}
+
+.animate-pop {
+  animation: nub-pop 0.3s ease-in-out;
+}
+
+.animate-wiggle {
+  animation: nub-wiggle 0.5s ease-in-out;
+}
+
+.animate-jello {
+  animation: nub-jello 0.5s ease-in-out;
+}
+
 /* ============================================================
-   WALRUS ANIMATIONS
+   OTTER ANIMATIONS
+   The star of the show
    ============================================================ */
 
-@keyframes walrus-swim {
+@keyframes otter-swim {
   0%, 100% {
     transform: translateY(0) rotate(-2deg);
   }
@@ -64,59 +86,127 @@
   }
 }
 
-@keyframes walrus-wave {
+@keyframes otter-wave {
   0%, 100% { transform: rotate(0deg); }
   25% { transform: rotate(15deg); }
   75% { transform: rotate(-15deg); }
 }
 
-@keyframes walrus-spin {
+@keyframes otter-spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
-@keyframes walrus-bounce {
-  0%, 100% {
+@keyframes otter-bounce {
+  0%, 100% { 
     transform: translateY(0);
     animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
   }
-  50% {
+  50% { 
     transform: translateY(-25%);
     animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
   }
 }
 
+.otter-swim {
+  animation: otter-swim 2s ease-in-out infinite;
+}
+
+.otter-wave {
+  animation: otter-wave 0.5s ease-in-out 3;
+}
+
+.otter-spin {
+  animation: otter-spin 1s linear infinite;
+}
+
+.otter-bounce {
+  animation: otter-bounce 1s infinite;
+}
+
 /* ============================================================
-   BASIC ANIMATIONS
+   BUTTON INTERACTIONS
+   Satisfying taps
    ============================================================ */
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.nub-button-tap {
+  position: relative;
+  overflow: hidden;
 }
 
-@keyframes slideUp {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
+.nub-button-tap::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+}
+
+.nub-button-tap:active::after {
+  width: 200%;
+  height: 200%;
+  opacity: 1;
+  transition: none;
+}
+
+/* Squish effect on tap */
+.nub-squish:active {
+  transform: scale(0.95);
+  transition: transform 0.1s ease;
+}
+
+/* Tilt on hover (desktop only) */
+@media (hover: hover) {
+  .nub-tilt:hover {
+    transform: perspective(500px) rotateX(5deg) rotateY(-5deg);
+    transition: transform 0.2s ease;
   }
 }
 
-@keyframes confettiFall {
-  0% {
-    transform: translateY(-100%) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(100vh) rotate(720deg);
-    opacity: 0;
+/* ============================================================
+   CARD ANIMATIONS
+   Entry, hover, and interaction
+   ============================================================ */
+
+.nub-card-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.nub-card-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Staggered entrance */
+.nub-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.nub-stagger > *:nth-child(2) { animation-delay: 50ms; }
+.nub-stagger > *:nth-child(3) { animation-delay: 100ms; }
+.nub-stagger > *:nth-child(4) { animation-delay: 150ms; }
+.nub-stagger > *:nth-child(5) { animation-delay: 200ms; }
+.nub-stagger > *:nth-child(6) { animation-delay: 250ms; }
+.nub-stagger > *:nth-child(7) { animation-delay: 300ms; }
+.nub-stagger > *:nth-child(8) { animation-delay: 350ms; }
+
+/* Hover lift */
+@media (hover: hover) {
+  .nub-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--nub-shadow-lg);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 }
 
 /* ============================================================
    LOADING ANIMATIONS
+   Fun while you wait
    ============================================================ */
 
 @keyframes nub-dots {
@@ -125,6 +215,19 @@
   100% { opacity: 0; }
 }
 
+.nub-loading-dots span {
+  animation: nub-dots 1.4s infinite;
+}
+
+.nub-loading-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.nub-loading-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Skeleton shimmer */
 @keyframes nub-shimmer {
   0% {
     background-position: -200% 0;
@@ -134,8 +237,44 @@
   }
 }
 
+.nub-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--nub-border) 0%,
+    var(--nub-surface) 50%,
+    var(--nub-border) 100%
+  );
+  background-size: 200% 100%;
+  animation: nub-shimmer 1.5s infinite;
+}
+
+/* Progress bar */
+@keyframes nub-progress {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.nub-progress-indeterminate::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 50%;
+  background: var(--nub-primary);
+  animation: nub-progress 1s ease-in-out infinite;
+}
+
+/* Spinning otter */
+.nub-spinner-otter {
+  font-size: 2rem;
+  animation: otter-spin 1s linear infinite;
+  display: inline-block;
+}
+
 /* ============================================================
    SUCCESS/ERROR ANIMATIONS
+   Celebrate or commiserate
    ============================================================ */
 
 @keyframes nub-checkmark {
@@ -147,14 +286,123 @@
   }
 }
 
+@keyframes nub-circle {
+  0% {
+    stroke-dashoffset: 166;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.nub-success-check {
+  stroke-dasharray: 50;
+  stroke-dashoffset: 50;
+  animation: nub-checkmark 0.4s ease-out 0.2s forwards;
+}
+
+.nub-success-circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  animation: nub-circle 0.4s ease-out forwards;
+}
+
 @keyframes nub-shake {
   0%, 100% { transform: translateX(0); }
   20%, 60% { transform: translateX(-10px); }
   40%, 80% { transform: translateX(10px); }
 }
 
+.nub-error-shake {
+  animation: nub-shake 0.4s ease-in-out;
+}
+
+/* Confetti */
+@keyframes nub-confetti-fall {
+  0% {
+    transform: translateY(-100%) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.nub-confetti {
+  position: fixed;
+  top: 0;
+  left: var(--x, 50%);
+  font-size: 1.5rem;
+  animation: nub-confetti-fall 3s ease-out forwards;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ============================================================
+   SWIPE ANIMATIONS
+   For mobile gestures
+   ============================================================ */
+
+@keyframes nub-swipe-hint {
+  0%, 100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(20px);
+    opacity: 0.5;
+  }
+}
+
+.nub-swipe-hint {
+  animation: nub-swipe-hint 1.5s ease-in-out infinite;
+}
+
+/* Swipe action reveal */
+.nub-swipe-reveal {
+  transform: translateX(var(--swipe-x, 0));
+  transition: transform 0.3s ease;
+}
+
+/* ============================================================
+   NOTIFICATION ANIMATIONS
+   Toasts that pop
+   ============================================================ */
+
+@keyframes nub-toast-enter {
+  0% {
+    transform: translateY(100%) scale(0.9);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes nub-toast-exit {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-20px) scale(0.9);
+    opacity: 0;
+  }
+}
+
+.nub-toast-enter {
+  animation: nub-toast-enter 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.nub-toast-exit {
+  animation: nub-toast-exit 0.2s ease-out forwards;
+}
+
 /* ============================================================
    SHEET/MODAL ANIMATIONS
+   Smooth reveals
    ============================================================ */
 
 @keyframes nub-sheet-up {
@@ -164,6 +412,11 @@
   100% {
     transform: translateY(0);
   }
+}
+
+@keyframes nub-fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
 @keyframes nub-zoom-in {
@@ -177,8 +430,113 @@
   }
 }
 
+.nub-sheet-enter {
+  animation: nub-sheet-up 0.3s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+.nub-modal-enter {
+  animation: nub-zoom-in 0.2s ease-out forwards;
+}
+
+.nub-backdrop-enter {
+  animation: nub-fade-in 0.2s ease-out forwards;
+}
+
+/* ============================================================
+   PAGE TRANSITIONS
+   Smooth navigation
+   ============================================================ */
+
+@keyframes nub-page-enter {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes nub-page-exit {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+}
+
+.nub-page-enter {
+  animation: nub-page-enter 0.3s ease-out forwards;
+}
+
+.nub-page-exit {
+  animation: nub-page-exit 0.2s ease-in forwards;
+}
+
+/* ============================================================
+   INTERACTIVE FEEDBACK
+   Visual responses to actions
+   ============================================================ */
+
+/* Ripple effect for touch */
+.nub-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.nub-ripple::before {
+  content: '';
+  position: absolute;
+  top: var(--ripple-y, 50%);
+  left: var(--ripple-x, 50%);
+  width: 0;
+  height: 0;
+  background: rgba(241, 155, 56, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease, opacity 0.6s ease;
+  opacity: 0;
+}
+
+.nub-ripple.rippling::before {
+  width: 300px;
+  height: 300px;
+  opacity: 1;
+  transition: none;
+}
+
+/* Pulse for attention */
+@keyframes nub-pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.nub-pulse-attention {
+  position: relative;
+}
+
+.nub-pulse-attention::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 2px solid var(--nub-primary);
+  border-radius: inherit;
+  animation: nub-pulse-ring 1.5s infinite;
+}
+
 /* ============================================================
    REDUCED MOTION
+   Respect user preferences
    ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
@@ -189,5 +547,12 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  
+  .otter-swim,
+  .otter-spin,
+  .otter-bounce,
+  .nub-pulse-attention::after {
+    animation: none !important;
   }
 }

@@ -20,6 +20,7 @@ const ActivityLog = lazy(() => import('./pages/ActivityLog'))
 const Login = lazy(() => import('./pages/Login'))
 const QAChecklist = lazy(() => import('./pages/QAChecklist'))
 const GameQueuePage = lazy(() => import('./pages/GameQueuePage'))
+const NotFound = lazy(() => import('./pages/NotFound'))
 
 // Loading fallback component
 const PageLoader = () => (
@@ -49,6 +50,7 @@ function App() {
           <Route path="qa-checklist" element={<QAChecklist />} />
           <Route path="game-queue" element={<GameQueuePage />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
     </Suspense>
