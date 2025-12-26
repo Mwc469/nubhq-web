@@ -1,10 +1,46 @@
-import { Suspense, lazy } from 'react'
+import { Suspense, lazy, Component } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import Layout from './pages/Layout'
 import NubSpinner from './components/ui/NubSpinner'
 import ProtectedRoute from './components/ProtectedRoute'
 import AmbientEventLayer from './components/ui/AmbientEventLayer'
+
+// Error boundary to catch React errors
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props)
+    this.state = { hasError: false, error: null }
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error }
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('React Error:', error, errorInfo)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-red-900 text-white p-8">
+          <h1 className="text-2xl font-bold mb-4">Something went wrong</h1>
+          <pre className="bg-black/50 p-4 rounded overflow-auto text-sm">
+            {this.state.error?.toString()}
+          </pre>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-white text-red-900 rounded font-bold"
+          >
+            Reload Page
+          </button>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
 
 // Lazy load pages - simplified to core approval experience
 const Portal = lazy(() => import('./pages/Portal'))
@@ -75,12 +111,12 @@ function AnimatedRoutes() {
 
 function App() {
   return (
-    <>
+    <ErrorBoundary>
       <Suspense fallback={<PageLoader />}>
         <AnimatedRoutes />
       </Suspense>
       <AmbientEventLayer />
-    </>
+    </ErrorBoundary>
   )
 }
 

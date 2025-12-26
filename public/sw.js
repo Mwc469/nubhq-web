@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nubhq-v1';
+const CACHE_NAME = 'nubhq-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

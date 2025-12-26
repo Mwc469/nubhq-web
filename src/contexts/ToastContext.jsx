@@ -61,6 +61,10 @@ export function ToastProvider({ children }) {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
+  const showToast = useCallback((message, type = 'info') => {
+    return addToast(message, type);
+  }, [addToast]);
+
   const toast = {
     success: (message) => addToast(message, 'success'),
     error: (message) => addToast(message, 'error'),
@@ -68,7 +72,7 @@ export function ToastProvider({ children }) {
   };
 
   return (
-    <ToastContext.Provider value={toast}>
+    <ToastContext.Provider value={{ ...toast, showToast }}>
       {children}
       {/* Toast Container */}
       <div className="fixed bottom-20 md:bottom-4 right-4 left-4 md:left-auto md:w-96 z-50 space-y-2">
