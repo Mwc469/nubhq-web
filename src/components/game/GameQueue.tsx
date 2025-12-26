@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { haptic, triggerConfetti } from '@/components/mobile/MobileComponents';
 import {
@@ -490,9 +491,24 @@ export function GameQueue() {
         />
       </div>
 
-      {/* Main Content */}
+      {/* Main Content with card entrance animation */}
       <main className="max-w-lg mx-auto px-4 py-4">
-        {renderCurrentItem()}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={queue[currentIndex]?.id ?? 'empty'}
+            initial={{ y: 40, opacity: 0, scale: 0.95 }}
+            animate={{ y: 0, opacity: 1, scale: 1 }}
+            exit={{ y: -20, opacity: 0, scale: 0.95 }}
+            transition={{
+              type: 'spring',
+              stiffness: 300,
+              damping: 25,
+              delay: 0.1, // Brief pause after previous card exits
+            }}
+          >
+            {renderCurrentItem()}
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       {/* Combo Display */}
