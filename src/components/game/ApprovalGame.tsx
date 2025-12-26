@@ -336,10 +336,30 @@ export function XpBar({ stats, recentXp }: XpBarProps) {
       </div>
 
       {/* XP Bar */}
-      <div className="relative h-4 bg-gray-200 rounded-full overflow-hidden">
+      <div
+        className="relative h-4 bg-gray-200 rounded-full overflow-hidden"
+        style={{
+          // Glow effect when close to level up (> 80%)
+          boxShadow: progress.percent > 80
+            ? '0 0 10px rgba(233, 30, 140, 0.5), 0 0 20px rgba(233, 30, 140, 0.3)'
+            : 'none',
+          transition: 'box-shadow 0.5s ease-out',
+        }}
+      >
         <div
-          className="absolute inset-y-0 left-0 bg-gradient-to-r from-neon-pink to-neon-orange transition-all duration-500"
-          style={{ width: `${progress.percent}%` }}
+          className="absolute inset-y-0 left-0 bg-gradient-to-r from-neon-pink to-neon-orange"
+          style={{
+            width: `${progress.percent}%`,
+            transition: 'width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)', // Bouncy easing
+          }}
+        />
+        {/* Shimmer effect on the bar */}
+        <div
+          className="absolute inset-y-0 w-20 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+          style={{
+            left: `${progress.percent - 10}%`,
+            animation: 'shimmer 2s infinite',
+          }}
         />
         {recentXp && recentXp > 0 && (
           <div

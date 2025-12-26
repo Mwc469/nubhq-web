@@ -118,6 +118,26 @@ const COMPANION_MESSAGES = {
     "That's certainly... a decision.",
     "I've seen things. This is one of them.",
   ],
+  // Tap progression messages
+  tap3: [
+    "Okay okay, I feel you!",
+    "Three taps? Someone's persistent!",
+    "Alright alright, you have my attention.",
+    "Keep going, see what happens...",
+  ],
+  tap7: [
+    "SERIOUSLY?! Seven taps?!",
+    "You absolute MANIAC. I love it.",
+    "This is getting out of hand!",
+    "Are you trying to break me?!",
+    "The walrus is overwhelmed!",
+  ],
+  tap10: [
+    "YOU FOUND THE SECRET!!! ULTRA WALRUS MODE!!!",
+    "TEN TAPS?! YOU ABSOLUTE LEGEND!!!",
+    "THE PROPHECY IS FULFILLED!!!",
+    "MAXIMUM WALRUS ENERGY ACHIEVED!!!",
+  ],
 };
 
 function getRandomMessage(category) {
@@ -138,6 +158,8 @@ export default function WalrusCompanion({
   const [message, setMessage] = useState('');
   const [tapCount, setTapCount] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isUltraMode, setIsUltraMode] = useState(false);
+  const [screenShake, setScreenShake] = useState(false);
 
   const sizeClasses = {
     sm: 'w-20 h-20',
@@ -198,17 +220,66 @@ export default function WalrusCompanion({
     const newTapCount = tapCount + 1;
     setTapCount(newTapCount);
 
-    // Easter egg: 5 rapid taps
-    if (newTapCount >= 5) {
+    // Tap progression easter eggs
+    if (newTapCount >= 10) {
+      // ULTRA MODE - 10 taps!
+      setIsUltraMode(true);
+      setScreenShake(true);
+      setCurrentMood('celebrating');
+      setMessage(getRandomMessage('tap10'));
+      haptic?.('success');
+      haptic?.('success'); // Double haptic for ultra
+      playSound('levelUp');
+      playSound('achievement');
+
+      // Store achievement unlock
+      const achievements = JSON.parse(localStorage.getItem('nub_hidden_achievements') || '[]');
+      if (!achievements.includes('walrus_whisperer')) {
+        achievements.push('walrus_whisperer');
+        localStorage.setItem('nub_hidden_achievements', JSON.stringify(achievements));
+      }
+
+      setTimeout(() => {
+        setScreenShake(false);
+        setIsUltraMode(false);
+        setTapCount(0);
+        setCurrentMood(mood);
+      }, 3000);
+    } else if (newTapCount >= 7) {
+      // Exasperated - 7 taps
+      setCurrentMood('celebrating');
+      setMessage(getRandomMessage('tap7'));
+      haptic?.('medium');
+      playSound('combo');
+      setTimeout(() => {
+        setMessage(pendingCount > 0
+          ? `${pendingCount} ${getRandomMessage('pending')}`
+          : getRandomMessage('greeting'));
+        setCurrentMood(mood);
+      }, 2500);
+    } else if (newTapCount >= 5) {
+      // Celebration - 5 taps (original easter egg)
       setCurrentMood('celebrating');
       setMessage(getRandomMessage('celebration'));
       haptic?.('success');
       playSound('achievement');
       setTimeout(() => {
-        setTapCount(0);
+        setMessage(pendingCount > 0
+          ? `${pendingCount} ${getRandomMessage('pending')}`
+          : getRandomMessage('greeting'));
         setCurrentMood(mood);
       }, 2000);
+    } else if (newTapCount >= 3) {
+      // Persistent - 3 taps
+      setMessage(getRandomMessage('tap3'));
+      haptic?.('medium');
+      setTimeout(() => {
+        setMessage(pendingCount > 0
+          ? `${pendingCount} ${getRandomMessage('pending')}`
+          : getRandomMessage('greeting'));
+      }, 2000);
     } else {
+      // Normal tap
       setMessage(getRandomMessage('tap'));
       setTimeout(() => {
         setMessage(pendingCount > 0
@@ -230,7 +301,23 @@ export default function WalrusCompanion({
   }, [tapCount]);
 
   return (
-    <div className={`relative flex flex-col items-center ${className}`}>
+    <div
+      className={`relative flex flex-col items-center ${className}`}
+      style={{
+        animation: screenShake ? 'shake 0.5s ease-in-out' : 'none',
+      }}
+    >
+      {/* Screen shake keyframes - injected inline */}
+      {screenShake && (
+        <style>{`
+          @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+          }
+        `}</style>
+      )}
+
       {/* Speech bubble */}
       <AnimatePresence mode="wait">
         {showSpeechBubble && message && (
@@ -295,29 +382,46 @@ export default function WalrusCompanion({
           draggable={false}
         />
 
-        {/* Celebration particles */}
+        {/* Celebration particles - more in ultra mode! */}
         <AnimatePresence>
           {currentMood === 'celebrating' && (
             <>
-              {[...Array(6)].map((_, i) => (
+              {[...Array(isUltraMode ? 20 : 6)].map((_, i) => (
                 <motion.div
                   key={i}
                   initial={{ opacity: 1, scale: 0, x: 0, y: 0 }}
                   animate={{
                     opacity: 0,
-                    scale: 1,
-                    x: (Math.random() - 0.5) * 100,
-                    y: -50 - Math.random() * 50,
+                    scale: isUltraMode ? 1.5 : 1,
+                    x: (Math.random() - 0.5) * (isUltraMode ? 200 : 100),
+                    y: -50 - Math.random() * (isUltraMode ? 100 : 50),
                   }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.8, delay: i * 0.1 }}
-                  className="absolute top-1/2 left-1/2 w-3 h-3 rounded-full"
+                  transition={{ duration: isUltraMode ? 1.2 : 0.8, delay: i * 0.05 }}
+                  className={`absolute top-1/2 left-1/2 rounded-full ${isUltraMode ? 'w-4 h-4' : 'w-3 h-3'}`}
                   style={{
-                    background: ['#E91E8C', '#9B30FF', '#00D4D4', '#E6C700'][i % 4],
+                    background: ['#E91E8C', '#9B30FF', '#00D4D4', '#E6C700', '#FF6B35', '#00FF88'][i % 6],
                   }}
                 />
               ))}
             </>
+          )}
+        </AnimatePresence>
+
+        {/* Ultra mode golden glow ring */}
+        <AnimatePresence>
+          {isUltraMode && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.3, 1] }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1, repeat: 2 }}
+              className="absolute inset-0 rounded-full"
+              style={{
+                background: 'radial-gradient(circle, rgba(255,215,0,0.4) 0%, transparent 70%)',
+                filter: 'blur(10px)',
+              }}
+            />
           )}
         </AnimatePresence>
       </motion.div>

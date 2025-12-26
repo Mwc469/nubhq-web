@@ -234,6 +234,8 @@ export default function GameHub() {
   const [sillyAchievement, setSillyAchievement] = useState(null);
   const [encouragement, setEncouragement] = useState(null);
   const [confettiActive, setConfettiActive] = useState(false);
+  const [luckyEvent, setLuckyEvent] = useState(null);
+  const [goldenConfetti, setGoldenConfetti] = useState(false);
 
   const playerStats = useMemo(() => getPlayerStats(), []);
   const levelInfo = useMemo(() => getLevelInfo(playerStats.xp), [playerStats.xp]);
@@ -293,6 +295,57 @@ export default function GameHub() {
 
     const interval = setInterval(confettiBurst, 45000);
     return () => clearInterval(interval);
+  }, []);
+
+  // RARE LUCKY EVENTS - super rare but exciting!
+  useEffect(() => {
+    const hasTriggeredLucky = sessionStorage.getItem('lucky_event_triggered');
+    if (hasTriggeredLucky) return;
+
+    const roll = Math.random();
+
+    // 1% chance: LUCKY WALRUS - 2x XP message
+    if (roll < 0.01) {
+      setTimeout(() => {
+        setLuckyEvent({
+          title: "LUCKY WALRUS!!!",
+          message: "The walrus gods smile upon you! You feel extra lucky today...",
+          icon: "🍀🦭",
+          color: "from-green-400 to-emerald-500",
+        });
+        playSound('levelUp');
+        haptic?.('success');
+        localStorage.setItem('nub_lucky_event', 'true');
+        sessionStorage.setItem('lucky_event_triggered', 'true');
+      }, 3000);
+    }
+    // 0.5% chance: GOLDEN CONFETTI with bonus XP
+    else if (roll < 0.015) {
+      setTimeout(() => {
+        setGoldenConfetti(true);
+        setLuckyEvent({
+          title: "GOLDEN SHOWER!!!",
+          message: "Wait, that came out wrong... It's GOLDEN CONFETTI! +50 bonus XP!",
+          icon: "✨🪙✨",
+          color: "from-yellow-400 to-amber-500",
+        });
+        playSound('achievement');
+        haptic?.('success');
+        haptic?.('success');
+
+        // Actually add bonus XP
+        try {
+          const stats = JSON.parse(localStorage.getItem('nub_player_stats') || '{}');
+          stats.xp = (stats.xp || 0) + 50;
+          localStorage.setItem('nub_player_stats', JSON.stringify(stats));
+        } catch (e) {}
+
+        localStorage.setItem('nub_lucky_event', 'true');
+        sessionStorage.setItem('lucky_event_triggered', 'true');
+
+        setTimeout(() => setGoldenConfetti(false), 4000);
+      }, 3000);
+    }
   }, []);
 
   const handleGameSelect = (game) => {
@@ -365,6 +418,72 @@ export default function GameHub() {
               />
             ))}
           </div>
+        )}
+      </AnimatePresence>
+
+      {/* GOLDEN CONFETTI - super rare! */}
+      <AnimatePresence>
+        {goldenConfetti && (
+          <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+            {[...Array(50)].map((_, i) => (
+              <motion.div
+                key={i}
+                initial={{
+                  opacity: 1,
+                  x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 400),
+                  y: -20,
+                  rotate: 0,
+                  scale: 0.5 + Math.random() * 1,
+                }}
+                animate={{
+                  opacity: 0,
+                  y: (typeof window !== 'undefined' ? window.innerHeight : 800) + 50,
+                  rotate: 720 * (Math.random() > 0.5 ? 1 : -1),
+                  x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 400),
+                }}
+                transition={{
+                  duration: 3 + Math.random() * 2,
+                  ease: 'linear',
+                }}
+                className="absolute rounded-sm"
+                style={{
+                  width: 8 + Math.random() * 8,
+                  height: 8 + Math.random() * 8,
+                  background: ['#FFD700', '#FFA500', '#FFDF00', '#FFB347', '#F4C430'][i % 5],
+                  boxShadow: '0 0 10px rgba(255, 215, 0, 0.5)',
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* LUCKY EVENT POPUP */}
+      <AnimatePresence>
+        {luckyEvent && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5, y: -100 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: -50 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-[60] w-[90%] max-w-sm"
+          >
+            <div
+              className={`relative px-6 py-5 bg-gradient-to-r ${luckyEvent.color} rounded-2xl border-4 border-black shadow-brutal-lg`}
+            >
+              <div className="text-center">
+                <div className="text-5xl mb-2 animate-bounce">{luckyEvent.icon}</div>
+                <h2 className="text-2xl font-black text-black mb-1">{luckyEvent.title}</h2>
+                <p className="text-black/80 font-medium">{luckyEvent.message}</p>
+              </div>
+              <button
+                onClick={() => setLuckyEvent(null)}
+                className="absolute top-2 right-2 w-8 h-8 bg-black/20 rounded-full flex items-center justify-center text-black font-bold"
+              >
+                ×
+              </button>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
 

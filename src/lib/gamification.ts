@@ -41,6 +41,7 @@ export interface Achievement {
   xpReward: number;
   rarity: 'common' | 'rare' | 'epic' | 'legendary';
   condition: (stats: PlayerStats) => boolean;
+  hidden?: boolean; // Hidden achievements - not shown until unlocked
 }
 
 export interface DailyChallenge {
@@ -266,6 +267,72 @@ export const ACHIEVEMENTS: Achievement[] = [
     xpReward: 2000,
     rarity: 'legendary',
     condition: (s) => s.level >= 10,
+  },
+
+  // HIDDEN ACHIEVEMENTS - Shhh! These are secrets!
+  {
+    id: 'quality_control',
+    title: 'Quality Control',
+    description: 'Reject 5 items in a row. Standards!',
+    icon: '🚫',
+    xpReward: 150,
+    rarity: 'rare',
+    hidden: true,
+    condition: () => {
+      const streak = localStorage.getItem('nub_reject_streak');
+      return parseInt(streak || '0') >= 5;
+    },
+  },
+  {
+    id: 'ultra_walrus',
+    title: 'Ultra Walrus Whisperer',
+    description: 'Found the 10-tap walrus secret!',
+    icon: '🦭✨',
+    xpReward: 200,
+    rarity: 'epic',
+    hidden: true,
+    condition: () => {
+      const achievements = JSON.parse(localStorage.getItem('nub_hidden_achievements') || '[]');
+      return achievements.includes('walrus_whisperer');
+    },
+  },
+  {
+    id: 'speed_freak',
+    title: 'Speed Freak',
+    description: '3 approvals in under 10 seconds. ZOOM!',
+    icon: '💨',
+    xpReward: 200,
+    rarity: 'epic',
+    hidden: true,
+    condition: () => {
+      const speedAchieved = localStorage.getItem('nub_speed_freak');
+      return speedAchieved === 'true';
+    },
+  },
+  {
+    id: 'night_grinder',
+    title: 'Night Grinder',
+    description: 'Complete 20 items after midnight',
+    icon: '🌙',
+    xpReward: 300,
+    rarity: 'epic',
+    hidden: true,
+    condition: () => {
+      const count = parseInt(localStorage.getItem('nub_night_approvals') || '0');
+      return count >= 20;
+    },
+  },
+  {
+    id: 'lucky_one',
+    title: 'The Lucky One',
+    description: 'Triggered a rare lucky event!',
+    icon: '🍀',
+    xpReward: 100,
+    rarity: 'rare',
+    hidden: true,
+    condition: () => {
+      return localStorage.getItem('nub_lucky_event') === 'true';
+    },
   },
 ];
 
