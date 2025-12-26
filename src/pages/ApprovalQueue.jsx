@@ -1,36 +1,10 @@
-import { useState } from 'react';
-import { Check, X, Clock, MessageSquare } from 'lucide-react';
+import { Check, X, Clock, MessageSquare, Loader2 } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import { useApprovals, useApprove, useReject } from '../hooks/useApi';
 
-const mockApprovals = [
-  {
-    id: 1,
-    type: 'message',
-    content: 'Hey! Thanks for subscribing. I really appreciate your support!',
-    recipient: 'user_123',
-    createdAt: '2024-01-15T10:30:00Z',
-    status: 'pending',
-  },
-  {
-    id: 2,
-    type: 'message',
-    content: 'Special content coming your way this weekend!',
-    recipient: 'user_456',
-    createdAt: '2024-01-15T09:15:00Z',
-    status: 'pending',
-  },
-  {
-    id: 3,
-    type: 'message',
-    content: 'Thanks for the tip! You are amazing.',
-    recipient: 'user_789',
-    createdAt: '2024-01-15T08:00:00Z',
-    status: 'pending',
-  },
-];
-
-const ApprovalCard = ({ item, onApprove, onReject }) => (
+const ApprovalCard = ({ item, onApprove, onReject, isApproving, isRejecting }) => (
   <Card className="space-y-4">
     <div className="flex items-start justify-between">
       <div className="flex items-center gap-2">
@@ -39,7 +13,7 @@ const ApprovalCard = ({ item, onApprove, onReject }) => (
       </div>
       <div className="flex items-center gap-1 text-xs text-white/40">
         <Clock size={14} />
-        <span>2h ago</span>
+        <span>{formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}</span>
       </div>
     </div>
 
@@ -50,18 +24,20 @@ const ApprovalCard = ({ item, onApprove, onReject }) => (
         variant="primary"
         size="sm"
         onClick={() => onApprove(item.id)}
+        disabled={isApproving || isRejecting}
         className="flex items-center gap-2"
       >
-        <Check size={16} />
+        {isApproving ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
         Approve
       </Button>
       <Button
         variant="ghost"
         size="sm"
         onClick={() => onReject(item.id)}
+        disabled={isApproving || isRejecting}
         className="flex items-center gap-2 text-red-400 hover:text-red-300"
       >
-        <X size={16} />
+        {isRejecting ? <Loader2 size={16} className="animate-spin" /> : <X size={16} />}
         Reject
       </Button>
     </div>
@@ -69,29 +45,43 @@ const ApprovalCard = ({ item, onApprove, onReject }) => (
 );
 
 const ApprovalQueue = () => {
-  const [approvals, setApprovals] = useState(mockApprovals);
+  const { data: approvals, isLoading, error } = useApprovals('pending');
+  const approveMutation = useApprove();
+  const rejectMutation = useReject();
 
   const handleApprove = (id) => {
-    setApprovals((prev) => prev.filter((item) => item.id !== id));
+    approveMutation.mutate(id);
   };
 
   const handleReject = (id) => {
-    setApprovals((prev) => prev.filter((item) => item.id !== id));
+    rejectMutation.mutate(id);
   };
+
+  if (error) {
+    return (
+      <Card className="text-center py-12">
+        <p className="text-red-400">Error loading approvals</p>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white">Approval Queue</h1>
-          <p className="text-white/60 mt-1">{approvals.length} items pending review</p>
+          <p className="text-white/60 mt-1">
+            {isLoading ? 'Loading...' : `${approvals?.length ?? 0} items pending review`}
+          </p>
         </div>
-        <Button variant="secondary" size="sm">
-          Approve All
-        </Button>
       </div>
 
-      {approvals.length === 0 ? (
+      {isLoading ? (
+        <Card className="text-center py-12">
+          <Loader2 size={48} className="mx-auto text-brand-orange mb-4 animate-spin" />
+          <p className="text-white/60">Loading approvals...</p>
+        </Card>
+      ) : approvals?.length === 0 ? (
         <Card className="text-center py-12">
           <Check size={48} className="mx-auto text-green-400 mb-4" />
           <h2 className="text-xl font-bold text-white">All caught up!</h2>
@@ -99,12 +89,14 @@ const ApprovalQueue = () => {
         </Card>
       ) : (
         <div className="space-y-4">
-          {approvals.map((item) => (
+          {approvals?.map((item) => (
             <ApprovalCard
               key={item.id}
               item={item}
               onApprove={handleApprove}
               onReject={handleReject}
+              isApproving={approveMutation.isPending && approveMutation.variables === item.id}
+              isRejecting={rejectMutation.isPending && rejectMutation.variables === item.id}
             />
           ))}
         </div>

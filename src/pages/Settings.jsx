@@ -1,6 +1,7 @@
-import { Settings as SettingsIcon, User, Bell, Shield, Palette } from 'lucide-react';
+import { User, Bell, Shield, Palette, Loader2 } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import { useSettings, useUpdateSettings } from '../hooks/useApi';
 
 const SettingSection = ({ icon: Icon, title, description, children }) => (
   <Card className="space-y-4">
@@ -18,6 +19,21 @@ const SettingSection = ({ icon: Icon, title, description, children }) => (
 );
 
 const Settings = () => {
+  const { data: settings, isLoading } = useSettings();
+  const updateMutation = useUpdateSettings();
+
+  const handleToggle = (field, currentValue) => {
+    updateMutation.mutate({ [field]: !currentValue });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 size={32} className="text-brand-orange animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -31,7 +47,10 @@ const Settings = () => {
           title="Profile"
           description="Update your profile information and display name"
         >
-          <Button variant="secondary" size="sm">Edit Profile</Button>
+          <div className="flex items-center gap-4">
+            <span className="text-white/80">Display name: {settings?.display_name || 'Not set'}</span>
+            <Button variant="secondary" size="sm">Edit Profile</Button>
+          </div>
         </SettingSection>
 
         <SettingSection
@@ -40,13 +59,25 @@ const Settings = () => {
           description="Configure how you receive alerts and updates"
         >
           <div className="space-y-3">
-            <label className="flex items-center justify-between">
+            <label className="flex items-center justify-between cursor-pointer">
               <span className="text-white/80">Push notifications</span>
-              <input type="checkbox" defaultChecked className="w-5 h-5 accent-brand-orange" />
+              <input
+                type="checkbox"
+                checked={settings?.push_notifications ?? true}
+                onChange={() => handleToggle('push_notifications', settings?.push_notifications)}
+                disabled={updateMutation.isPending}
+                className="w-5 h-5 accent-brand-orange cursor-pointer"
+              />
             </label>
-            <label className="flex items-center justify-between">
+            <label className="flex items-center justify-between cursor-pointer">
               <span className="text-white/80">Email notifications</span>
-              <input type="checkbox" defaultChecked className="w-5 h-5 accent-brand-orange" />
+              <input
+                type="checkbox"
+                checked={settings?.email_notifications ?? true}
+                onChange={() => handleToggle('email_notifications', settings?.email_notifications)}
+                disabled={updateMutation.isPending}
+                className="w-5 h-5 accent-brand-orange cursor-pointer"
+              />
             </label>
           </div>
         </SettingSection>
