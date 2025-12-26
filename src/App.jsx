@@ -5,6 +5,8 @@ import NubSpinner from './components/ui/NubSpinner'
 import ProtectedRoute from './components/ProtectedRoute'
 
 // Lazy load all pages for code splitting
+const Portal = lazy(() => import('./pages/Portal'))
+const GameHub = lazy(() => import('./pages/GameHub'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const ApprovalQueue = lazy(() => import('./pages/ApprovalQueue'))
 const ContentCalendar = lazy(() => import('./pages/ContentCalendar'))
@@ -34,9 +36,14 @@ function App() {
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
+        {/* Portal entry experience */}
+        <Route path="/portal" element={<Portal />} />
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-          <Route index element={<Dashboard />} />
+          {/* GameHub is the new default - game-like dashboard */}
+          <Route index element={<GameHub />} />
+          {/* Keep old dashboard accessible */}
+          <Route path="dashboard-classic" element={<Dashboard />} />
           <Route path="approvals" element={<ApprovalQueue />} />
           <Route path="calendar" element={<ContentCalendar />} />
           <Route path="ai-trainer" element={<AITrainer />} />
