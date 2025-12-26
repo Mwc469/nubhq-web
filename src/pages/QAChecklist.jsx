@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { 
-  CheckCircle2, Circle, ClipboardCheck, Navigation, PenTool, 
+import {
+  CheckCircle2, Circle, ClipboardCheck, Navigation, PenTool,
   CheckSquare, Calendar, Image, Inbox, BarChart3, Mail, Video,
-  Settings, Shield, AlertTriangle, Zap
+  Settings, Shield, AlertTriangle, Zap, Gamepad2
 } from 'lucide-react';
 import NeoBrutalCard from '@/components/ui/NeoBrutalCard';
 import PageHeader from '@/components/ui/PageHeader';
@@ -152,6 +152,29 @@ const QA_SECTIONS = [
       { id: 'tpl-5', label: 'Copy button → content copied to clipboard' },
       { id: 'tpl-6', label: 'Favorite toggle works' },
       { id: 'tpl-7', label: 'Search/filter by type works' },
+    ],
+  },
+  {
+    id: 'gamemode',
+    title: 'Game Mode Tests',
+    icon: Gamepad2,
+    color: 'purple',
+    tests: [
+      { id: 'game-1', label: 'Page loads with XP bar showing level and progress' },
+      { id: 'game-2', label: 'Daily Challenges button shows challenge modal' },
+      { id: 'game-3', label: 'Queue stats show remaining/completed/skipped counts' },
+      { id: 'game-4', label: 'Swipe card RIGHT → approves post, +XP toast appears' },
+      { id: 'game-5', label: 'Swipe card LEFT → rejects post, toast appears' },
+      { id: 'game-6', label: 'Swipe card UP → skips post, advances queue' },
+      { id: 'game-7', label: 'Tap Approve/Reject/Skip buttons work as alternative to swipe' },
+      { id: 'game-8', label: 'Fast decisions (under 3s) → combo counter appears' },
+      { id: 'game-9', label: 'Voice Training card → pick option → reveals tone, awards XP' },
+      { id: 'game-10', label: 'Media Comparison card → pick A or B → awards XP' },
+      { id: 'game-11', label: 'XP bar updates in real-time after each action' },
+      { id: 'game-12', label: 'Level up triggers confetti and celebratory toast' },
+      { id: 'game-13', label: 'Empty queue shows "Queue Clear" with refresh button' },
+      { id: 'game-14', label: 'Stats persist in localStorage across page refreshes' },
+      { id: 'game-15', label: 'Streak counter shows consecutive days (if applicable)' },
     ],
   },
   {
