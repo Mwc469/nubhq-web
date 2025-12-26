@@ -286,6 +286,26 @@ body {
   box-shadow: 6px 6px 0 var(--neon-orange);
 }
 
+/* Colored shadows - large variants (6px offset) */
+.shadow-brutal-pink-lg {
+  box-shadow: 6px 6px 0 var(--neon-pink);
+}
+.shadow-brutal-cyan-lg {
+  box-shadow: 6px 6px 0 var(--neon-cyan);
+}
+.shadow-brutal-yellow-lg {
+  box-shadow: 6px 6px 0 var(--neon-yellow);
+}
+.shadow-brutal-green-lg {
+  box-shadow: 6px 6px 0 var(--neon-green);
+}
+.shadow-brutal-purple-lg {
+  box-shadow: 6px 6px 0 var(--neon-purple);
+}
+.shadow-brutal-orange-lg {
+  box-shadow: 6px 6px 0 var(--neon-orange);
+}
+
 /* ============================================================
    TYPOGRAPHY SCALE
    Semantic text classes for consistent hierarchy

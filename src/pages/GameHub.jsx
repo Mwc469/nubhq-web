@@ -23,8 +23,9 @@ import { CosmicGlow } from '../components/ui/CosmicBackground';
 import WalrusCompanion from '../components/companion/WalrusCompanion';
 import { LEVELS, XP_REWARDS } from '../lib/gamification';
 import { playSound } from '../lib/soundSystem';
-import { haptic } from '../components/mobile/MobileComponents';
+import { haptic, PullToRefresh } from '../components/mobile/MobileComponents';
 import { cn } from '../lib/utils';
+import { useGestureHint } from '../components/ui/GestureHint';
 
 // SILLY ACHIEVEMENTS - for doing absolutely nothing
 const SILLY_ACHIEVEMENTS = [
@@ -236,9 +237,16 @@ export default function GameHub() {
   const [confettiActive, setConfettiActive] = useState(false);
   const [luckyEvent, setLuckyEvent] = useState(null);
   const [goldenConfetti, setGoldenConfetti] = useState(false);
+  const [playerStats, setPlayerStats] = useState(() => getPlayerStats());
 
-  const playerStats = useMemo(() => getPlayerStats(), []);
   const levelInfo = useMemo(() => getLevelInfo(playerStats.xp), [playerStats.xp]);
+
+  // Pull-to-refresh handler
+  const handleRefresh = async () => {
+    await new Promise(resolve => setTimeout(resolve, 500)); // Brief delay for feel
+    setPlayerStats(getPlayerStats());
+    playSound('success');
+  };
 
   // Mock pending counts (would come from API)
   const pendingCounts = {
@@ -365,8 +373,9 @@ export default function GameHub() {
   };
 
   return (
-    <div className="relative min-h-full pb-24">
-      <CosmicGlow />
+    <PullToRefresh onRefresh={handleRefresh}>
+      <div className="relative min-h-full pb-24">
+        <CosmicGlow />
 
       {/* Silly achievement popup */}
       <AnimatePresence>
@@ -654,5 +663,6 @@ export default function GameHub() {
         </motion.div>
       </div>
     </div>
+    </PullToRefresh>
   );
 }

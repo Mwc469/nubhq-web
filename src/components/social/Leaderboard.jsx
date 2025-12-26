@@ -7,6 +7,7 @@ import { Trophy, Flame, Zap, Crown, Medal } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useTheme } from '../../contexts/ThemeContext';
 import { playSound } from '../../lib/soundSystem';
+import { PullToRefresh } from '../mobile/MobileComponents';
 
 // Mock leaderboard data (would come from API in production)
 const MOCK_LEADERBOARDS = {
@@ -58,30 +59,39 @@ const RANK_STYLES = {
   3: { bg: 'bg-gradient-to-r from-amber-600 to-amber-700', text: 'text-white', icon: '🥉' },
 };
 
+// Helper functions to read from localStorage
+function getPlayerStats() {
+  try {
+    const stored = localStorage.getItem('nub_player_stats');
+    return stored ? JSON.parse(stored) : { xp: 0, streak: 0, totalApprovals: 0 };
+  } catch {
+    return { xp: 0, streak: 0, totalApprovals: 0 };
+  }
+}
+
+function getSpeedRushScore() {
+  try {
+    const scores = JSON.parse(localStorage.getItem('nub_speed_rush_scores') || '[]');
+    return scores[0]?.score || 0;
+  } catch {
+    return 0;
+  }
+}
+
 export default function Leaderboard({ className }) {
   const { theme } = useTheme();
   const isLight = theme === 'light';
   const [activeTab, setActiveTab] = useState('xp');
+  const [playerStats, setPlayerStats] = useState(() => getPlayerStats());
+  const [speedRushScore, setSpeedRushScore] = useState(() => getSpeedRushScore());
 
-  // Get current user stats to populate "You" entries
-  const playerStats = useMemo(() => {
-    try {
-      const stored = localStorage.getItem('nub_player_stats');
-      return stored ? JSON.parse(stored) : { xp: 0, streak: 0, totalApprovals: 0 };
-    } catch {
-      return { xp: 0, streak: 0, totalApprovals: 0 };
-    }
-  }, []);
-
-  // Get Speed Rush high score
-  const speedRushScore = useMemo(() => {
-    try {
-      const scores = JSON.parse(localStorage.getItem('nub_speed_rush_scores') || '[]');
-      return scores[0]?.score || 0;
-    } catch {
-      return 0;
-    }
-  }, []);
+  // Pull-to-refresh handler
+  const handleRefresh = async () => {
+    await new Promise(resolve => setTimeout(resolve, 400));
+    setPlayerStats(getPlayerStats());
+    setSpeedRushScore(getSpeedRushScore());
+    playSound('success');
+  };
 
   // Update mock data with actual user stats
   const leaderboardData = useMemo(() => {
@@ -115,6 +125,7 @@ export default function Leaderboard({ className }) {
   const currentTab = TABS.find(t => t.id === activeTab);
 
   return (
+    <PullToRefresh onRefresh={handleRefresh}>
     <div className={className}>
       {/* Tabs */}
       <div className="flex gap-2 mb-6 overflow-x-auto pb-2 -mx-1 px-1">
@@ -228,5 +239,6 @@ export default function Leaderboard({ className }) {
         Leaderboards reset every week. Keep grinding!
       </div>
     </div>
+    </PullToRefresh>
   );
 }

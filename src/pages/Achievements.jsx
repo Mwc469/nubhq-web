@@ -8,6 +8,7 @@ import { cn } from '../lib/utils';
 import { useTheme } from '../contexts/ThemeContext';
 import { ACHIEVEMENTS, LEVELS } from '../lib/gamification';
 import { playSound } from '../lib/soundSystem';
+import { PullToRefresh } from '../components/mobile/MobileComponents';
 
 function getPlayerStats() {
   try {
@@ -57,8 +58,14 @@ export default function Achievements() {
   const [filter, setFilter] = useState('all');
   const [selectedAchievement, setSelectedAchievement] = useState(null);
   const [showHidden, setShowHidden] = useState(false);
+  const [stats, setStats] = useState(() => getPlayerStats());
 
-  const stats = useMemo(() => getPlayerStats(), []);
+  // Pull-to-refresh handler
+  const handleRefresh = async () => {
+    await new Promise(resolve => setTimeout(resolve, 400));
+    setStats(getPlayerStats());
+    playSound('success');
+  };
   const levelInfo = useMemo(() => getLevelInfo(stats.xp), [stats.xp]);
 
   // Check which achievements are unlocked
@@ -101,6 +108,7 @@ export default function Achievements() {
   const hiddenUnlockedCount = achievementsWithStatus.filter(a => a.hidden && a.unlocked).length;
 
   return (
+    <PullToRefresh onRefresh={handleRefresh}>
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="mb-6">
@@ -205,6 +213,7 @@ export default function Achievements() {
         )}
       </AnimatePresence>
     </div>
+    </PullToRefresh>
   );
 }
 

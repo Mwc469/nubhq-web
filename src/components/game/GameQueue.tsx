@@ -14,6 +14,7 @@ import {
   QueueStats,
   EmptyQueue,
 } from './ApprovalGame';
+import GestureHint, { useGestureHint } from '@/components/ui/GestureHint';
 import { VoiceTraining, VoiceTrainingIntro, SAMPLE_VOICE_PROMPTS, type VoiceOption, type VoicePrompt } from './VoiceTraining';
 import { MediaComparisonPicker, SAMPLE_COMPARISONS, type MediaComparison } from './MediaComparison';
 import {
@@ -112,6 +113,9 @@ export function GameQueue() {
   // Completed/skipped counts for stats
   const [sessionCompleted, setSessionCompleted] = useState(0);
   const [sessionSkipped, setSessionSkipped] = useState(0);
+
+  // Gesture hint for new users
+  const swipeHint = useGestureHint('swipe');
 
   // ============================================================
   // LOAD QUEUE
@@ -513,6 +517,15 @@ export function GameQueue() {
 
       {/* Combo Display */}
       <ComboDisplay combo={combo} visible={showCombo} />
+
+      {/* Swipe Gesture Hint for first-time users */}
+      {swipeHint.shouldShow && queue[currentIndex]?.type === 'post' && (
+        <GestureHint
+          type="swipe"
+          message="Swipe left to reject, right to approve"
+          onDismiss={swipeHint.dismiss}
+        />
+      )}
 
       {/* Daily Challenges Modal */}
       {showChallenges && (

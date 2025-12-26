@@ -4,38 +4,38 @@ import { useTheme } from '../../contexts/ThemeContext';
 
 const accentStyles = {
   pink: {
-    solid: 'bg-neon-pink text-white border-neon-pink shadow-[4px_4px_0_#000] hover:shadow-[6px_6px_0_#000]',
-    outline: 'bg-transparent text-neon-pink border-neon-pink shadow-[4px_4px_0_var(--neon-pink)] hover:shadow-[6px_6px_0_var(--neon-pink)] hover:bg-neon-pink/10',
+    solid: 'bg-neon-pink text-white border-neon-pink shadow-brutal hover:shadow-brutal-lg',
+    outline: 'bg-transparent text-neon-pink border-neon-pink shadow-brutal-pink hover:shadow-brutal-pink-lg hover:bg-neon-pink/10',
     ghost: 'bg-transparent text-neon-pink border-transparent hover:bg-neon-pink/10',
   },
   cyan: {
-    solid: 'bg-neon-cyan text-white border-neon-cyan shadow-[4px_4px_0_#000] hover:shadow-[6px_6px_0_#000]',
-    outline: 'bg-transparent text-neon-cyan border-neon-cyan shadow-[4px_4px_0_var(--neon-cyan)] hover:shadow-[6px_6px_0_var(--neon-cyan)] hover:bg-neon-cyan/10',
+    solid: 'bg-neon-cyan text-white border-neon-cyan shadow-brutal hover:shadow-brutal-lg',
+    outline: 'bg-transparent text-neon-cyan border-neon-cyan shadow-brutal-cyan hover:shadow-brutal-cyan-lg hover:bg-neon-cyan/10',
     ghost: 'bg-transparent text-neon-cyan border-transparent hover:bg-neon-cyan/10',
   },
   yellow: {
-    solid: 'bg-neon-yellow text-black border-neon-yellow shadow-[4px_4px_0_#000] hover:shadow-[6px_6px_0_#000]',
-    outline: 'bg-transparent text-neon-yellow border-neon-yellow shadow-[4px_4px_0_var(--neon-yellow)] hover:shadow-[6px_6px_0_var(--neon-yellow)] hover:bg-neon-yellow/10',
+    solid: 'bg-neon-yellow text-black border-neon-yellow shadow-brutal hover:shadow-brutal-lg',
+    outline: 'bg-transparent text-neon-yellow border-neon-yellow shadow-brutal-yellow hover:shadow-brutal-yellow-lg hover:bg-neon-yellow/10',
     ghost: 'bg-transparent text-neon-yellow border-transparent hover:bg-neon-yellow/10',
   },
   green: {
-    solid: 'bg-neon-green text-white border-neon-green shadow-[4px_4px_0_#000] hover:shadow-[6px_6px_0_#000]',
-    outline: 'bg-transparent text-neon-green border-neon-green shadow-[4px_4px_0_var(--neon-green)] hover:shadow-[6px_6px_0_var(--neon-green)] hover:bg-neon-green/10',
+    solid: 'bg-neon-green text-white border-neon-green shadow-brutal hover:shadow-brutal-lg',
+    outline: 'bg-transparent text-neon-green border-neon-green shadow-brutal-green hover:shadow-brutal-green-lg hover:bg-neon-green/10',
     ghost: 'bg-transparent text-neon-green border-transparent hover:bg-neon-green/10',
   },
   purple: {
-    solid: 'bg-neon-purple text-white border-neon-purple shadow-[4px_4px_0_#000] hover:shadow-[6px_6px_0_#000]',
-    outline: 'bg-transparent text-neon-purple border-neon-purple shadow-[4px_4px_0_var(--neon-purple)] hover:shadow-[6px_6px_0_var(--neon-purple)] hover:bg-neon-purple/10',
+    solid: 'bg-neon-purple text-white border-neon-purple shadow-brutal hover:shadow-brutal-lg',
+    outline: 'bg-transparent text-neon-purple border-neon-purple shadow-brutal-purple hover:shadow-brutal-purple-lg hover:bg-neon-purple/10',
     ghost: 'bg-transparent text-neon-purple border-transparent hover:bg-neon-purple/10',
   },
   orange: {
-    solid: 'bg-neon-orange text-white border-neon-orange shadow-[4px_4px_0_#000] hover:shadow-[6px_6px_0_#000]',
-    outline: 'bg-transparent text-neon-orange border-neon-orange shadow-[4px_4px_0_var(--neon-orange)] hover:shadow-[6px_6px_0_var(--neon-orange)] hover:bg-neon-orange/10',
+    solid: 'bg-neon-orange text-white border-neon-orange shadow-brutal hover:shadow-brutal-lg',
+    outline: 'bg-transparent text-neon-orange border-neon-orange shadow-brutal-orange hover:shadow-brutal-orange-lg hover:bg-neon-orange/10',
     ghost: 'bg-transparent text-neon-orange border-transparent hover:bg-neon-orange/10',
   },
   neutral: {
-    solid: 'bg-gray-900 text-white border-gray-900 shadow-[4px_4px_0_#000] hover:shadow-[6px_6px_0_#000] dark:bg-white dark:text-gray-900 dark:border-white',
-    outline: 'bg-transparent text-gray-900 border-gray-900 shadow-[4px_4px_0_#000] hover:shadow-[6px_6px_0_#000] hover:bg-gray-100 dark:text-white dark:border-white dark:hover:bg-white/10',
+    solid: 'bg-gray-900 text-white border-gray-900 shadow-brutal hover:shadow-brutal-lg dark:bg-white dark:text-gray-900 dark:border-white',
+    outline: 'bg-transparent text-gray-900 border-gray-900 shadow-brutal hover:shadow-brutal-lg hover:bg-gray-100 dark:text-white dark:border-white dark:hover:bg-white/10',
     ghost: 'bg-transparent text-gray-900 border-transparent hover:bg-gray-100 dark:text-white dark:hover:bg-white/10',
   },
 };
