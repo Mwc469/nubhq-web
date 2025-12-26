@@ -741,6 +741,278 @@ const TemplatesCard = ({ templates, isLoading, onRefresh }) => {
   );
 };
 
+// Job Management Panel
+const JobsPanel = ({ isLoading }) => {
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
+  const { showToast } = useToast();
+  const [jobs, setJobs] = useState([]);
+  const [stats, setStats] = useState(null);
+  const [loadingJobs, setLoadingJobs] = useState(true);
+  const [processingId, setProcessingId] = useState(null);
+
+  const fetchJobs = async () => {
+    try {
+      const [jobsData, statsData] = await Promise.all([
+        fetchWithAuth(`${API_BASE}/api/video-pipeline/jobs?limit=20`),
+        fetchWithAuth(`${API_BASE}/api/video-pipeline/jobs/stats`),
+      ]);
+      setJobs(jobsData.jobs || []);
+      setStats(statsData);
+    } catch (error) {
+      logger.error('Failed to fetch jobs:', error);
+    } finally {
+      setLoadingJobs(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchJobs();
+    const interval = setInterval(fetchJobs, 10000); // Refresh every 10s
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleRetry = async (jobId) => {
+    setProcessingId(jobId);
+    try {
+      await fetchWithAuth(`${API_BASE}/api/video-pipeline/jobs/${jobId}/retry`, {
+        method: 'POST',
+      });
+      playSound('approve');
+      showToast('Job queued for retry', 'success');
+      fetchJobs();
+    } catch (error) {
+      showToast('Failed to retry job', 'error');
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  const handleDelete = async (jobId) => {
+    setProcessingId(jobId);
+    try {
+      await fetchWithAuth(`${API_BASE}/api/video-pipeline/jobs/${jobId}`, {
+        method: 'DELETE',
+      });
+      playSound('reject');
+      showToast('Job removed', 'info');
+      fetchJobs();
+    } catch (error) {
+      showToast('Failed to delete job', 'error');
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  const handleCleanup = async () => {
+    if (!confirm('Delete all completed jobs older than 7 days?')) return;
+    try {
+      const result = await fetchWithAuth(`${API_BASE}/api/video-pipeline/jobs/cleanup?days=7&status=completed`, {
+        method: 'DELETE',
+      });
+      showToast(`Cleaned up ${result.deleted_count} jobs`, 'success');
+      fetchJobs();
+    } catch (error) {
+      showToast('Failed to cleanup jobs', 'error');
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'completed': return 'text-neon-green';
+      case 'failed': return 'text-neon-pink';
+      case 'processing': return 'text-neon-cyan';
+      case 'pending': return 'text-neon-yellow';
+      default: return isLight ? 'text-gray-500' : 'text-white/50';
+    }
+  };
+
+  const getStatusBg = (status) => {
+    switch (status) {
+      case 'completed': return 'bg-neon-green/20';
+      case 'failed': return 'bg-neon-pink/20';
+      case 'processing': return 'bg-neon-cyan/20';
+      case 'pending': return 'bg-neon-yellow/20';
+      default: return isLight ? 'bg-gray-100' : 'bg-white/10';
+    }
+  };
+
+  if (isLoading || loadingJobs) {
+    return (
+      <NeoBrutalCard accentColor="cyan" className="space-y-4">
+        <Skeleton className="h-6 w-32" />
+        <Skeleton className="h-32 w-full" />
+      </NeoBrutalCard>
+    );
+  }
+
+  return (
+    <NeoBrutalCard accentColor="cyan" className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-neon-cyan/20 flex items-center justify-center">
+            <Loader2 size={20} className="text-neon-cyan" />
+          </div>
+          <div>
+            <h3 className={cn('font-bold', isLight ? 'text-gray-900' : 'text-white')}>
+              Processing Jobs
+            </h3>
+            <p className={cn('text-xs', isLight ? 'text-gray-500' : 'text-white/50')}>
+              {stats?.total_jobs || 0} total jobs
+            </p>
+          </div>
+        </div>
+        <NeoBrutalButton
+          variant="outline"
+          size="sm"
+          onClick={handleCleanup}
+        >
+          <Trash2 size={14} /> Cleanup
+        </NeoBrutalButton>
+      </div>
+
+      {/* Stats Grid */}
+      {stats && (
+        <div className={cn(
+          'grid grid-cols-4 gap-2 p-3 rounded-xl',
+          isLight ? 'bg-gray-50' : 'bg-white/5'
+        )}>
+          <div className="text-center">
+            <div className="text-lg font-black text-neon-yellow">
+              {stats.by_status?.pending || 0}
+            </div>
+            <div className={cn('text-xs', isLight ? 'text-gray-500' : 'text-white/50')}>
+              Pending
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-lg font-black text-neon-cyan">
+              {stats.by_status?.processing || 0}
+            </div>
+            <div className={cn('text-xs', isLight ? 'text-gray-500' : 'text-white/50')}>
+              Processing
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-lg font-black text-neon-green">
+              {stats.by_status?.completed || 0}
+            </div>
+            <div className={cn('text-xs', isLight ? 'text-gray-500' : 'text-white/50')}>
+              Completed
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-lg font-black text-neon-pink">
+              {stats.by_status?.failed || 0}
+            </div>
+            <div className={cn('text-xs', isLight ? 'text-gray-500' : 'text-white/50')}>
+              Failed
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Jobs List */}
+      {jobs.length === 0 ? (
+        <div className={cn(
+          'p-6 rounded-xl text-center',
+          isLight ? 'bg-gray-50' : 'bg-white/5'
+        )}>
+          <Loader2 className={cn('w-8 h-8 mx-auto mb-2', isLight ? 'text-gray-300' : 'text-white/20')} />
+          <p className={cn('text-sm', isLight ? 'text-gray-500' : 'text-white/50')}>
+            No jobs yet
+          </p>
+          <p className={cn('text-xs mt-1', isLight ? 'text-gray-400' : 'text-white/30')}>
+            Jobs will appear when you process videos
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-2 max-h-64 overflow-y-auto">
+          <AnimatePresence>
+            {jobs.map(job => (
+              <motion.div
+                key={job.job_id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, x: -100 }}
+                className={cn(
+                  'flex items-center gap-3 p-3 rounded-lg',
+                  isLight ? 'bg-gray-50' : 'bg-white/5'
+                )}
+              >
+                <div className={cn(
+                  'w-8 h-8 rounded-lg flex items-center justify-center',
+                  getStatusBg(job.status)
+                )}>
+                  {job.status === 'processing' ? (
+                    <Loader2 size={14} className={cn('animate-spin', getStatusColor(job.status))} />
+                  ) : job.status === 'completed' ? (
+                    <CheckCircle size={14} className={getStatusColor(job.status)} />
+                  ) : job.status === 'failed' ? (
+                    <XCircle size={14} className={getStatusColor(job.status)} />
+                  ) : (
+                    <Activity size={14} className={getStatusColor(job.status)} />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className={cn('text-sm font-medium truncate', isLight ? 'text-gray-900' : 'text-white')}>
+                      {job.type}
+                    </p>
+                    <span className={cn(
+                      'px-2 py-0.5 rounded-full text-xs font-bold',
+                      getStatusBg(job.status),
+                      getStatusColor(job.status)
+                    )}>
+                      {job.status}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <p className={cn('text-xs truncate', isLight ? 'text-gray-500' : 'text-white/50')}>
+                      {job.job_id}
+                    </p>
+                    {job.progress > 0 && job.progress < 100 && (
+                      <span className="text-xs text-neon-cyan font-bold">{job.progress}%</span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex gap-1 flex-shrink-0">
+                  {job.status === 'failed' && job.retry_count < job.max_retries && (
+                    <button
+                      onClick={() => handleRetry(job.job_id)}
+                      disabled={processingId === job.job_id}
+                      className={cn(
+                        'p-2 rounded-lg',
+                        isLight ? 'hover:bg-gray-100' : 'hover:bg-white/10'
+                      )}
+                    >
+                      {processingId === job.job_id ? (
+                        <Loader2 size={14} className="animate-spin text-neon-cyan" />
+                      ) : (
+                        <RefreshCw size={14} className="text-neon-cyan" />
+                      )}
+                    </button>
+                  )}
+                  <button
+                    onClick={() => handleDelete(job.job_id)}
+                    disabled={processingId === job.job_id}
+                    className={cn(
+                      'p-2 rounded-lg',
+                      isLight ? 'hover:bg-red-100' : 'hover:bg-red-500/10'
+                    )}
+                  >
+                    <Trash2 size={14} className="text-red-400" />
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+      )}
+    </NeoBrutalCard>
+  );
+};
+
 // Activity History Card
 const ActivityHistory = ({ isLoading }) => {
   const { theme } = useTheme();
@@ -916,8 +1188,8 @@ const VideoPipeline = () => {
         {/* Left Column */}
         <div className="space-y-6">
           <PipelineStatus health={health} isLoading={loading} />
+          <JobsPanel isLoading={loading} />
           <LearningStats stats={stats} isLoading={loading} />
-          <ActivityHistory isLoading={loading} />
         </div>
 
         {/* Right Column */}
@@ -929,6 +1201,7 @@ const VideoPipeline = () => {
             onReject={handleReject}
           />
           <TemplatesCard templates={templates} isLoading={loading} onRefresh={fetchData} />
+          <ActivityHistory isLoading={loading} />
         </div>
       </div>
     </div>
