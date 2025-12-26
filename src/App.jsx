@@ -13,6 +13,7 @@ const GameQueuePage = lazy(() => import('./pages/GameQueuePage'))
 const AITrainer = lazy(() => import('./pages/AITrainer'))
 const Settings = lazy(() => import('./pages/Settings'))
 const Unlocks = lazy(() => import('./pages/Unlocks'))
+const VideoPipeline = lazy(() => import('./pages/VideoPipeline'))
 const LeaderboardPage = lazy(() => import('./pages/Leaderboard'))
 const Achievements = lazy(() => import('./pages/Achievements'))
 const Login = lazy(() => import('./pages/Login'))
@@ -61,6 +62,8 @@ function AnimatedRoutes() {
           <Route path="leaderboard" element={<PageTransition><LeaderboardPage /></PageTransition>} />
           {/* Achievements gallery */}
           <Route path="achievements" element={<PageTransition><Achievements /></PageTransition>} />
+          {/* Video Pipeline */}
+          <Route path="pipeline" element={<PageTransition><VideoPipeline /></PageTransition>} />
           {/* Settings */}
           <Route path="settings" element={<PageTransition><Settings /></PageTransition>} />
           <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />

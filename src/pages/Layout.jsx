@@ -12,6 +12,7 @@ import {
   Gamepad2,
   Zap,
   Flame,
+  Video,
 } from 'lucide-react';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { cn } from '../lib/utils';
@@ -85,6 +86,7 @@ const navItems = [
   { to: '/play/email', icon: Mail, label: 'Email Blast', tagline: 'Newsletter', color: 'cyan' },
   { to: '/play/replies', icon: MessageSquare, label: 'Reply Review', tagline: 'Responses', color: 'purple' },
   { to: '/train', icon: Bot, label: 'Train Brain', tagline: 'Teach AI', color: 'orange' },
+  { to: '/pipeline', icon: Video, label: 'Video Lab', tagline: 'Content Factory', color: 'cyan' },
   { to: '/settings', icon: Settings, label: 'Settings', tagline: 'Preferences', color: 'neutral' },
 ];
 
